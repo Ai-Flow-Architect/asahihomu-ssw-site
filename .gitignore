@@ -1,0 +1,21 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# Python
+__pycache__/
+*.pyc
+
+# 開発用の一時物（納品物ではない）
+shot.py
+screenshots/
+
+# ローカル確認用の一時物（dist はビルド成果物としてコミット可。除外したい場合は下行を有効化）
+# dist/
+
+# 写真の原本(最適化前・リポには最適化版のみ置く)
+src/assets/img/source/
+optimize_img.py

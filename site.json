@@ -1,0 +1,90 @@
+{
+  "site": {
+    "name": "あさひほうむ 特定技能サポート",
+    "short_name": "あさひほうむ 特定技能",
+    "tagline": "きづきを、きずなに。",
+    "description": "茨城・千葉の登録支援機関。社労士×行政書士×キャリアコンサルタントのワンストップで、特定技能外国人材の受け入れを「安く・手厚く」サポートします。",
+    "base_url": "https://ai-flow-architect.github.io/asahihomu-ssw-site",
+    "lang": "ja",
+    "locale": "ja_JP",
+    "theme_color": "#1b3a5b",
+    "copyright_holder": "あさひほうむ（あさひ労務管理センター）",
+    "preview": true,
+    "_note_preview": "true=仮プレビュー公開。全ページ noindex,nofollow ＋ robots.txt 全Disallow（検索結果に出さない）。本番公開時に false へ。",
+    "_note_base_url": "本番ドメイン未確定（御社ご負担の実費契約）。受注後に確定URLへ差し替え。"
+  },
+  "org": {
+    "legal_name": "あさひ労務管理センター茨城労働保険管理協会",
+    "brand_name": "あさひほうむ 特定技能サポート",
+    "representative": "（代表者名 ※受注後に確定）",
+    "founded": "（設立年 ※受注後に確定）",
+    "registration_no": "登録支援機関 登録番号 ※受注後に確定（例：26登-XXXXXX）",
+    "areas": [
+      "茨城事務所",
+      "千葉事務所"
+    ],
+    "address": "（所在地 ※公開情報未確定・受注後に確定）",
+    "tel": "000-0000-0000",
+    "tel_note": "※電話番号は未公開のため仮置き。受注後に差し替え。",
+    "email": "info@example.com",
+    "email_note": "※メールアドレスは仮置き。受注後にお問い合わせ送信先を確定。",
+    "hours": "平日 9:00〜18:00（土日祝休み）",
+    "qualifications": [
+      "社会保険労務士",
+      "行政書士",
+      "キャリアコンサルタント"
+    ]
+  },
+  "contact": {
+    "form_endpoint": "",
+    "_note_form_endpoint": "🔴 送信先未確定。Formspree/独自サーバー等を受注後に設定。空のままだと送信はモック動作。"
+  },
+  "nav": [
+    {
+      "label": "特定技能とは",
+      "href": "about-ssw.html"
+    },
+    {
+      "label": "支援内容",
+      "href": "support.html"
+    },
+    {
+      "label": "対応分野",
+      "href": "industries.html"
+    },
+    {
+      "label": "料金",
+      "href": "pricing.html"
+    },
+    {
+      "label": "ご利用の流れ",
+      "href": "flow.html"
+    },
+    {
+      "label": "選ばれる理由",
+      "href": "reasons.html"
+    },
+    {
+      "label": "求人情報",
+      "href": "jobs.html"
+    },
+    {
+      "label": "お役立ち情報",
+      "href": "blog.html"
+    },
+    {
+      "label": "よくある質問",
+      "href": "faq.html"
+    },
+    {
+      "label": "事務所紹介",
+      "href": "about-us.html"
+    }
+  ],
+  "cta": {
+    "primary_label": "無料で相談する",
+    "primary_href": "contact.html",
+    "secondary_label": "資料をダウンロード",
+    "secondary_href": "members.html"
+  }
+}

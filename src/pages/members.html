@@ -1,0 +1,57 @@
+<section class="page-hero">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="パンくず"><a href="index.html">ホーム</a><span>›</span>会員ページ</nav>
+    <h1>会員ページ</h1>
+    <p>既存のお客様向けの限定ページです。各種資料をダウンロードいただけます。</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="grid grid--2" style="align-items:start;">
+      <div>
+        <h2 style="margin-top:0;">会員ログイン</h2>
+        <p class="muted">お客様ごとに発行するIDとパスワードでログインしてください。</p>
+        <p class="placeholder-note">※ ログイン認証・限定資料のダウンロードは、受注後に会員管理のしくみ（認証基盤）を構築して有効化します。現在はデモ表示です。</p>
+
+        <div class="notice" id="member-note" style="display:none;margin:16px 0;"></div>
+
+        <form class="form" id="member-login" novalidate style="margin-top:16px;">
+          <div class="field">
+            <label for="m-id">会員ID</label>
+            <input type="text" id="m-id" name="会員ID" autocomplete="username">
+          </div>
+          <div class="field">
+            <label for="m-pw">パスワード</label>
+            <input type="password" id="m-pw" name="パスワード" autocomplete="current-password">
+          </div>
+          <button class="btn btn--primary btn--lg" type="submit">ログイン</button>
+          <p class="form__note">IDをお持ちでない既存のお客様は、<a href="contact.html">お問い合わせ</a>よりご連絡ください。</p>
+        </form>
+      </div>
+
+      <aside>
+        <div class="card">
+          <h3 style="margin-top:0;">会員限定でできること</h3>
+          <ul class="checklist" style="margin-top:14px;">
+            <li>各種申請書類のテンプレート配布</li>
+            <li>受け入れチェックリスト等の限定資料</li>
+            <li>制度改正のお知らせ（会員向け）</li>
+            <li>更新手続きのリマインド</li>
+          </ul>
+        </div>
+
+        <div class="card" style="margin-top:20px;">
+          <h3 style="margin-top:0;">資料一覧（イメージ）</h3>
+          <ul class="dl-list" style="margin-top:14px;">
+            <li><span>📄 受け入れ準備チェックリスト</span><span class="tag">会員限定</span></li>
+            <li><span>📄 雇用条件書テンプレート</span><span class="tag">会員限定</span></li>
+            <li><span>📄 生活オリエンテーション資料</span><span class="tag">会員限定</span></li>
+            <li><span>📄 更新手続きの手引き</span><span class="tag">会員限定</span></li>
+          </ul>
+          <p class="muted" style="font-size:.82rem;margin-top:12px;">※ ログイン後にダウンロードいただけます（受注後に有効化）。</p>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>

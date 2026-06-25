@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="{{LANG}}">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+<meta name="description" content="{{DESCRIPTION}}">
+<meta name="robots" content="{{ROBOTS}}">
+<link rel="canonical" href="{{CANONICAL}}">
+<!-- OGP -->
+<meta property="og:type" content="{{OG_TYPE}}">
+<meta property="og:title" content="{{TITLE}}">
+<meta property="og:description" content="{{DESCRIPTION}}">
+<meta property="og:site_name" content="{{SITE_NAME}}">
+<meta property="og:locale" content="{{LOCALE}}">
+<meta property="og:url" content="{{CANONICAL}}">
+<meta property="og:image" content="{{BASE_URL}}/assets/img/ogp.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="{{THEME_COLOR}}">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+{{JSONLD}}
+</head>
+<body>
+<a class="skip-link" href="#main">本文へスキップ</a>
+
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a class="brand" href="index.html" aria-label="{{SITE_NAME}} トップへ">
+      <span class="brand__mark" aria-hidden="true"></span>
+      <span>あさひほうむ<small>特定技能サポート</small></span>
+    </a>
+    <nav class="nav" aria-label="メインメニュー">
+      <ul class="nav__list">
+        {{NAV_DESKTOP}}
+      </ul>
+    </nav>
+    <a class="btn btn--primary header-cta" href="contact.html">無料で相談する</a>
+    <button class="nav-toggle" type="button" aria-label="メニューを開く" aria-expanded="false" aria-controls="mobile-menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="container">
+    <div class="mobile-menu" id="mobile-menu">
+      <ul>
+        {{NAV_MOBILE}}
+      </ul>
+      <a class="btn btn--primary" href="contact.html">無料で相談する</a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+{{CONTENT}}
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="index.html">
+          <span class="brand__mark" aria-hidden="true"></span>
+          <span>あさひほうむ<small>特定技能サポート</small></span>
+        </a>
+        <p>{{ORG_LEGAL}}<br>登録支援機関として、特定技能外国人材の受け入れを「安く・手厚く」ワンストップで支援します。</p>
+      </div>
+      <div>
+        <h4>サービス</h4>
+        <ul>
+          <li><a href="about-ssw.html">特定技能とは</a></li>
+          <li><a href="support.html">支援内容</a></li>
+          <li><a href="industries.html">対応分野</a></li>
+          <li><a href="pricing.html">料金プラン</a></li>
+          <li><a href="flow.html">ご利用の流れ</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>情報</h4>
+        <ul>
+          <li><a href="jobs.html">求人情報</a></li>
+          <li><a href="blog.html">お役立ち情報</a></li>
+          <li><a href="faq.html">よくある質問</a></li>
+          <li><a href="about-us.html">事務所紹介</a></li>
+          <li><a href="members.html">会員ページ</a></li>
+          <li><a href="privacy.html">プライバシーポリシー</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; <span id="copyright-year">2026</span> {{COPYRIGHT}} All Rights Reserved.
+    </div>
+  </div>
+</footer>
+
+<script src="assets/js/main.js" defer></script>
+</body>
+</html>
