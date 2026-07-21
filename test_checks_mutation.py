@@ -46,6 +46,11 @@ MUTANTS = [
     ("結果表示先がformの外", "contact.html",
      '<div class="form-status" role="status" aria-live="polite"></div>', "", "form"),
     ("フォームの必須項目消失", "contact.html", " required", "", "form", -1),
+    # 本番URLで実際に見つかった: 本文を直しても meta description に旧法人名が残っていた
+    ("旧法人名がmetaに残存", "about-us.html",
+     'name="description" content="', 'name="description" content="あさひ労務管理センター。',
+     "forbidden"),
+    ("拠点の誤記(2拠点)", "index.html", "<h2>", "<h2>茨城・千葉の2拠点</h2><h2>", "forbidden"),
 ]
 
 
