@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>会員ページ（限定資料ダウンロード）｜あさひほうむ</title>
-<meta name="description" content="既存のお客様向けの会員ページ。各種申請書類のテンプレートや限定資料をダウンロードいただけます。">
+<title>特定技能 受け入れガイドブック（無料）｜あさひほうむ</title>
+<meta name="description" content="特定技能外国人の受け入れに役立つガイドブックを無料でご用意しています。メールアドレスのご登録だけで、審査なしでご覧いただけます。">
 <meta name="robots" content="noindex,nofollow">
 <link rel="canonical" href="https://ai-flow-architect.github.io/asahihomu-ssw-site/members.html">
 <!-- OGP -->
 <meta property="og:type" content="article">
-<meta property="og:title" content="会員ページ（限定資料ダウンロード）｜あさひほうむ">
-<meta property="og:description" content="既存のお客様向けの会員ページ。各種申請書類のテンプレートや限定資料をダウンロードいただけます。">
+<meta property="og:title" content="特定技能 受け入れガイドブック（無料）｜あさひほうむ">
+<meta property="og:description" content="特定技能外国人の受け入れに役立つガイドブックを無料でご用意しています。メールアドレスのご登録だけで、審査なしでご覧いただけます。">
 <meta property="og:site_name" content="あさひほうむ 特定技能サポート">
 <meta property="og:locale" content="ja_JP">
 <meta property="og:url" content="https://ai-flow-architect.github.io/asahihomu-ssw-site/members.html">
@@ -28,11 +28,11 @@
     "Organization"
   ],
   "name": "あさひほうむ 特定技能サポート",
-  "legalName": "あさひ労務管理センター茨城労働保険管理協会",
+  "legalName": "株式会社あさひほうむ",
   "description": "茨城・千葉の登録支援機関。社労士×行政書士×キャリアコンサルタントのワンストップで、特定技能外国人材の受け入れを「安く・手厚く」サポートします。",
   "url": "https://ai-flow-architect.github.io/asahihomu-ssw-site",
-  "telephone": "000-0000-0000",
-  "email": "info@example.com",
+  "telephone": "090-2915-4773",
+  "email": "asahihomehome@gmail.com",
   "areaServed": [
     "茨城県",
     "千葉県"
@@ -47,7 +47,9 @@
   "openingHours": "Mo-Fr 09:00-18:00",
   "address": {
     "@type": "PostalAddress",
-    "addressRegion": "茨城県・千葉県",
+    "streetAddress": "榎戸681-5",
+    "addressLocality": "つくば市",
+    "addressRegion": "茨城県",
     "addressCountry": "JP"
   }
 }
@@ -66,7 +68,7 @@
     {
       "@type": "ListItem",
       "position": 2,
-      "name": "会員ページ",
+      "name": "資料ダウンロード",
       "item": "https://ai-flow-architect.github.io/asahihomu-ssw-site/members.html"
     }
   ]
@@ -124,9 +126,9 @@
 <main id="main">
 <section class="page-hero">
   <div class="container">
-    <nav class="breadcrumb" aria-label="パンくず"><a href="index.html">ホーム</a><span>›</span>会員ページ</nav>
-    <h1>会員ページ</h1>
-    <p>既存のお客様向けの限定ページです。各種資料をダウンロードいただけます。</p>
+    <nav class="breadcrumb" aria-label="パンくず"><a href="index.html">ホーム</a><span>›</span>資料ダウンロード</nav>
+    <h1>資料ダウンロード</h1>
+    <p>特定技能の受け入れに役立つ資料を、無料でご用意しています。<br>第1弾のガイドブックは現在準備中です。ご登録いただいた方から、公開時にご案内します。</p>
   </div>
 </section>
 
@@ -134,46 +136,53 @@
   <div class="container">
     <div class="grid grid--2" style="align-items:start;">
       <div>
-        <h2 style="margin-top:0;">会員ログイン</h2>
-        <p class="muted">お客様ごとに発行するIDとパスワードでログインしてください。</p>
-        <p class="placeholder-note">※ ログイン認証・限定資料のダウンロードは、受注後に会員管理のしくみ（認証基盤）を構築して有効化します。現在はデモ表示です。</p>
+        <h2 style="margin-top:0;">メールアドレスのご登録だけ。審査も承認もありません</h2>
+        <p class="muted">ガイドブックは現在準備中です。ご登録いただいた方には、公開でき次第いちばんにご案内します。公開後は、ご登録のその場でダウンロードいただけます。</p>
+        <p class="placeholder-note">※ 資料の配信は、本番ドメイン・サーバーの確定後に有効化します。現在はデモ表示です。</p>
 
         <div class="notice" id="member-note" style="display:none;margin:16px 0;"></div>
 
         <form class="form" id="member-login" novalidate style="margin-top:16px;">
           <div class="field">
-            <label for="m-id">会員ID</label>
-            <input type="text" id="m-id" name="会員ID" autocomplete="username">
+            <label for="m-company">会社名・団体名</label>
+            <input type="text" id="m-company" name="会社名" autocomplete="organization">
           </div>
           <div class="field">
-            <label for="m-pw">パスワード</label>
-            <input type="password" id="m-pw" name="パスワード" autocomplete="current-password">
+            <label for="m-name">お名前</label>
+            <input type="text" id="m-name" name="お名前" autocomplete="name">
           </div>
-          <button class="btn btn--primary btn--lg" type="submit">ログイン</button>
-          <p class="form__note">IDをお持ちでない既存のお客様は、<a href="contact.html">お問い合わせ</a>よりご連絡ください。</p>
+          <div class="field">
+            <label for="m-email">メールアドレス</label>
+            <input type="email" id="m-email" name="メール" autocomplete="email" placeholder="example@mail.com">
+          </div>
+          <div class="field">
+            <div class="checkbox-row">
+              <input type="checkbox" id="m-agree" name="同意" required>
+              <label for="m-agree" style="font-weight:600;"><a href="privacy.html" target="_blank" rel="noopener">プライバシーポリシー</a>に同意します<span class="req">必須</span></label>
+            </div>
+            <p class="field__error">プライバシーポリシーへの同意が必要です。</p>
+          </div>
+          <button class="btn btn--primary btn--lg" type="submit">ガイドブックの公開案内を受け取る</button>
+          <p class="form__note">ご登録いただいたメールアドレスは、資料のご案内と制度改正のお知らせにのみ使用します。第三者へ提供することはありません。詳しくは<a href="privacy.html">プライバシーポリシー</a>をご覧ください。</p>
         </form>
       </div>
 
       <aside>
         <div class="card">
-          <h3 style="margin-top:0;">会員限定でできること</h3>
-          <ul class="checklist" style="margin-top:14px;">
-            <li>各種申請書類のテンプレート配布</li>
-            <li>受け入れチェックリスト等の限定資料</li>
-            <li>制度改正のお知らせ（会員向け）</li>
-            <li>更新手続きのリマインド</li>
+          <h3 style="margin-top:0;">ご用意している資料</h3>
+          <ul class="dl-list" style="margin-top:14px;">
+            <li><span>📘 特定技能 受け入れガイドブック</span><span class="tag">準備中</span></li>
           </ul>
+          <p class="muted" style="font-size:.82rem;margin-top:12px;">※ まずはガイドブックからご用意し、資料は順次追加していきます。</p>
         </div>
 
         <div class="card" style="margin-top:20px;">
-          <h3 style="margin-top:0;">資料一覧（イメージ）</h3>
-          <ul class="dl-list" style="margin-top:14px;">
-            <li><span>📄 受け入れ準備チェックリスト</span><span class="tag">会員限定</span></li>
-            <li><span>📄 雇用条件書テンプレート</span><span class="tag">会員限定</span></li>
-            <li><span>📄 生活オリエンテーション資料</span><span class="tag">会員限定</span></li>
-            <li><span>📄 更新手続きの手引き</span><span class="tag">会員限定</span></li>
+          <h3 style="margin-top:0;">ご登録いただくと</h3>
+          <ul class="checklist" style="margin-top:14px;">
+            <li>ガイドブックの公開をいちばんにご案内</li>
+            <li>今後追加する資料もそのままご利用いただけます</li>
+            <li>制度改正のお知らせをメールでお届け</li>
           </ul>
-          <p class="muted" style="font-size:.82rem;margin-top:12px;">※ ログイン後にダウンロードいただけます（受注後に有効化）。</p>
         </div>
       </aside>
     </div>
@@ -190,7 +199,7 @@
           <span class="brand__mark" aria-hidden="true"></span>
           <span>あさひほうむ<small>特定技能サポート</small></span>
         </a>
-        <p>あさひ労務管理センター茨城労働保険管理協会<br>登録支援機関として、特定技能外国人材の受け入れを「安く・手厚く」ワンストップで支援します。</p>
+        <p>株式会社あさひほうむ<br>登録支援機関として、特定技能外国人材の受け入れを「安く・手厚く」ワンストップで支援します。</p>
       </div>
       <div>
         <h4>サービス</h4>
@@ -209,13 +218,13 @@
           <li><a href="blog.html">お役立ち情報</a></li>
           <li><a href="faq.html">よくある質問</a></li>
           <li><a href="about-us.html">事務所紹介</a></li>
-          <li><a href="members.html">会員ページ</a></li>
+          <li><a href="members.html">資料ダウンロード</a></li>
           <li><a href="privacy.html">プライバシーポリシー</a></li>
         </ul>
       </div>
     </div>
     <div class="footer-bottom">
-      &copy; <span id="copyright-year">2026</span> あさひほうむ（あさひ労務管理センター） All Rights Reserved.
+      &copy; <span id="copyright-year">2026</span> 株式会社あさひほうむ All Rights Reserved.
     </div>
   </div>
 </footer>

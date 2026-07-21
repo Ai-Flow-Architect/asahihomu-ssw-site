@@ -7,7 +7,7 @@
   src/templates/base.html（共通レイアウト）に
   src/pages/<slug>.html（各ページ本文）を流し込み、
   共通トークン（社名・連絡先・ナビ・SEOメタ・構造化データ）を置換して
-  dist/ に 15ページの完成HTML + sitemap.xml + robots.txt を出力する。
+  dist/ に全ページの完成HTML + sitemap.xml + robots.txt を出力する。
 
 特徴:
   - ヘッダー/フッター/ナビは base.html に一元化（DRY・更新は1か所）
@@ -15,15 +15,20 @@
   - 依存ライブラリなし。python3 build.py だけで再生成可能。
 
 使い方:
-  python3 build.py
+  python3 build.py              # dist/ を再生成（ローカル確認用）
+  python3 build.py --publish    # dist/ を docs/ へ同期（GitHub Pages 公開ディレクトリ）
+                                # ⚠️ push するとクライアント可視のプレビューURLに即反映される
 """
+import html
 import json
 import shutil
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 SRC = ROOT / "src"
 DIST = ROOT / "dist"
+DOCS = ROOT / "docs"  # GitHub Pages の公開ディレクトリ（--publish で dist から同期）
 CFG = json.loads((ROOT / "site.json").read_text(encoding="utf-8"))
 
 # ---- ページ定義（slug, title, description, og_type, robots, jsonld種別） ----
@@ -81,23 +86,68 @@ PAGES = [
      "title": "お問い合わせ｜あさひほうむ 特定技能サポート",
      "desc": "特定技能外国人材の受け入れ・登録支援機関への委託に関するご相談・お見積りはこちらから。お気軽にお問い合わせください。",
      "jsonld": "contact"},
-    {"slug": "members", "name": "会員ページ",
-     "title": "会員ページ（限定資料ダウンロード）｜あさひほうむ",
-     "desc": "既存のお客様向けの会員ページ。各種申請書類のテンプレートや限定資料をダウンロードいただけます。",
-     "jsonld": None, "robots": "noindex,follow"},
+    # メール登録だけで即ダウンロード（承認制にしない＝客様ご指定）＝リード獲得ページなので検索対象にする
+    {"slug": "members", "name": "資料ダウンロード",
+     "title": "特定技能 受け入れガイドブック（無料）｜あさひほうむ",
+     "desc": "特定技能外国人の受け入れに役立つガイドブックを無料でご用意しています。メールアドレスのご登録だけで、審査なしでご覧いただけます。",
+     "jsonld": None, "priority": "0.8"},
     {"slug": "privacy", "name": "プライバシーポリシー",
      "title": "プライバシーポリシー｜あさひほうむ 特定技能サポート",
      "desc": "あさひほうむ 特定技能サポートにおける個人情報の取り扱い方針（プライバシーポリシー）です。",
      "jsonld": None},
+    # ---- 分野別SEO入口ページ（フル設計 B1・親=対応分野） ----
+    {"slug": "industry-manufacturing", "name": "製造業の特定技能",
+     "title": "製造業（工業製品製造業）の特定技能 受け入れサポート｜あさひほうむ",
+     "desc": "製造業（工業製品製造業・飲食料品製造業）で特定技能外国人を受け入れるための要件・流れ・注意点を解説。茨城・千葉の登録支援機関が申請から定着までワンストップで支援します。",
+     "jsonld": "service", "parent": {"slug": "industries", "name": "対応分野"},
+     "priority": "0.8"},
+    {"slug": "industry-agriculture", "name": "農業の特定技能",
+     "title": "農業の特定技能 受け入れサポート｜あさひほうむ",
+     "desc": "農業分野で特定技能外国人を受け入れるための要件・派遣形態の活用・季節性への対応を解説。茨城・千葉の登録支援機関が地域の農業経営をワンストップで支援します。",
+     "jsonld": "service", "parent": {"slug": "industries", "name": "対応分野"},
+     "priority": "0.8"},
+    {"slug": "industry-care", "name": "介護の特定技能",
+     "title": "介護分野の特定技能 受け入れサポート｜あさひほうむ",
+     "desc": "介護分野で特定技能外国人を受け入れるための要件・試験・配置基準の考え方・定着支援を解説。茨城・千葉の登録支援機関が介護現場の人材確保をワンストップで支援します。",
+     "jsonld": "service", "parent": {"slug": "industries", "name": "対応分野"},
+     "priority": "0.7"},
+    # ---- 初期記事5本（フル設計 B3・親=お役立ち情報） ----
+    {"slug": "blog-difference", "name": "特定技能と技能実習の違い",
+     "title": "特定技能と技能実習、結局どう違う？企業がまず押さえるべき3つのポイント｜あさひほうむ",
+     "desc": "特定技能と技能実習の違いを「目的・転職・期間」の3つの観点からやさしく整理。外国人材の採用がはじめての企業向けに、どちらの制度を選ぶべきかの考え方を解説します。",
+     "jsonld": "post", "date": "2026-06-20", "category": "制度解説",
+     "parent": {"slug": "blog", "name": "お役立ち情報"}, "priority": "0.6"},
+    {"slug": "blog-preparation", "name": "受け入れ前の準備チェックリスト",
+     "title": "外国人材を受け入れる前に企業が準備すべきこと【チェックリスト付き】｜あさひほうむ",
+     "desc": "特定技能外国人の受け入れ前に企業がやるべき準備を、雇用条件・社内体制・住まい・生活支援の4領域のチェックリストで整理。抜け漏れなく受け入れを始められます。",
+     "jsonld": "post", "date": "2026-06-10", "category": "受け入れ実務",
+     "parent": {"slug": "blog", "name": "お役立ち情報"}, "priority": "0.6"},
+    {"slug": "blog-cost", "name": "受け入れ費用の内訳",
+     "title": "特定技能の受け入れにかかる費用の内訳をわかりやすく解説｜あさひほうむ",
+     "desc": "特定技能外国人の受け入れにかかる費用を「初期費用・毎月かかる費用・その他の費用」の3つに分けて整理。何にいくらかかるのかの全体像と、費用を抑える考え方を解説します。",
+     "jsonld": "post", "date": "2026-05-28", "category": "費用",
+     "parent": {"slug": "blog", "name": "お役立ち情報"}, "priority": "0.6"},
+    {"slug": "blog-retention", "name": "定着の工夫",
+     "title": "外国人材に長く働いてもらうための「定着」の工夫｜あさひほうむ",
+     "desc": "せっかく受け入れた外国人材の早期離職を防ぐには。コミュニケーション・生活支援・キャリアの見通しの3つの観点から、現場ですぐできる定着の工夫を紹介します。",
+     "jsonld": "post", "date": "2026-05-15", "category": "定着支援",
+     "parent": {"slug": "blog", "name": "お役立ち情報"}, "priority": "0.6"},
+    {"slug": "blog-care-attention", "name": "介護分野の受け入れ注意点",
+     "title": "介護分野で特定技能を受け入れるときの注意点｜あさひほうむ",
+     "desc": "介護分野で特定技能外国人を受け入れる際に押さえるべき注意点を解説。必要な試験・従事できる業務の範囲・利用者や職員への配慮など、介護現場ならではのポイントをまとめました。",
+     "jsonld": "post", "date": "2026-05-02", "category": "分野別",
+     "parent": {"slug": "blog", "name": "お役立ち情報"}, "priority": "0.6"},
 ]
 
 
 def nav_html(current_slug):
     desk, mob = [], []
     for item in CFG["nav"]:
-        href = item["href"]
-        desk.append('<li><a href="{0}" data-nav>{1}</a></li>'.format(href, item["label"]))
-        mob.append('<li><a href="{0}">{1}</a></li>'.format(href, item["label"]))
+        # href は属性値に入るのでエスケープする（本文の {{CONTENT}} は信頼済みHTMLなので対象外）
+        href = html.escape(item["href"], quote=True)
+        label = html.escape(item["label"])
+        desk.append('<li><a href="{0}" data-nav>{1}</a></li>'.format(href, label))
+        mob.append('<li><a href="{0}">{1}</a></li>'.format(href, label))
     # お問い合わせ / 会員 はナビ末尾（モバイルのみ）に補助導線
     mob.append('<li><a href="contact.html">お問い合わせ</a></li>')
     return "\n        ".join(desk), "\n        ".join(mob)
@@ -118,7 +168,9 @@ def org_jsonld():
         "areaServed": ["茨城県", "千葉県"],
         "knowsAbout": ["特定技能", "登録支援機関", "外国人雇用", "労務管理", "在留資格"],
         "openingHours": "Mo-Fr 09:00-18:00",
-        "address": {"@type": "PostalAddress", "addressRegion": "茨城県・千葉県", "addressCountry": "JP"},
+        "address": {"@type": "PostalAddress", "streetAddress": "榎戸681-5",
+                    "addressLocality": "つくば市", "addressRegion": "茨城県",
+                    "addressCountry": "JP"},
     }
     return data
 
@@ -131,7 +183,7 @@ def faq_jsonld():
         ("登録支援機関に委託すると何をしてもらえますか？",
          "事前ガイダンスや生活オリエンテーション、公的手続きの同行、相談・苦情対応など、法律で義務づけられた10項目の支援を企業に代わって実施します。受け入れ企業の事務負担を大きく軽減できます。"),
         ("費用はどのくらいかかりますか？",
-         "支援委託費は受け入れ人数や支援内容によって異なります。あさひほうむでは安さと手厚さを両立した明朗な料金でご案内しています。詳しくはお問い合わせください。"),
+         "生活支援費は1名あたり月額15,000円です。一般的な団体では月額35,000円〜50,000円（当社調べ）のため、たとえば現在 月額35,000円で委託されている企業が10名を5年間受け入れる場合、1,200万円ほどの差が生まれます。なお、ここで比較しているのは月額の生活支援費のみです。初期費用やスポット対応の費用は受け入れ人数・分野によって異なりますので、無料でお見積りいたします。"),
         ("受け入れまでどのくらいの期間が必要ですか？",
          "海外からの新規入国か、国内在留者の切り替えかによって異なりますが、一般的に数か月程度を見込みます。スケジュールも含めて個別にご案内します。"),
         ("茨城・千葉以外でも対応してもらえますか？",
@@ -149,14 +201,39 @@ def faq_jsonld():
 def breadcrumb_jsonld(page):
     if page["slug"] == "index":
         return None
+    base = CFG["site"]["base_url"]
+    items = [{"@type": "ListItem", "position": 1, "name": "ホーム", "item": base + "/"}]
+    # 親ページがある場合は3階層（ホーム › 親 › 当ページ）
+    parent = page.get("parent")
+    if parent:
+        items.append({"@type": "ListItem", "position": 2, "name": parent["name"],
+                      "item": base + "/" + parent["slug"] + ".html"})
+    items.append({"@type": "ListItem", "position": len(items) + 1, "name": page["name"],
+                  "item": base + "/" + page["slug"] + ".html"})
     return {
         "@context": "https://schema.org",
         "@type": "BreadcrumbList",
-        "itemListElement": [
-            {"@type": "ListItem", "position": 1, "name": "ホーム", "item": CFG["site"]["base_url"] + "/"},
-            {"@type": "ListItem", "position": 2, "name": page["name"],
-             "item": CFG["site"]["base_url"] + "/" + page["slug"] + ".html"},
-        ],
+        "itemListElement": items,
+    }
+
+
+def post_jsonld(page):
+    # 記事ページ用 BlogPosting（著者=組織・日付は本公開時に実公開日へ更新）
+    site = CFG["site"]
+    url = site["base_url"] + "/" + page["slug"] + ".html"
+    return {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": page["title"].split("｜")[0],
+        "description": page["desc"],
+        "datePublished": page["date"],
+        "dateModified": page["date"],
+        "inLanguage": site["lang"],
+        "mainEntityOfPage": {"@type": "WebPage", "@id": url},
+        "author": {"@type": "Organization", "name": site["name"]},
+        "publisher": {"@type": "Organization", "name": site["name"],
+                      "url": site["base_url"]},
+        "articleSection": page.get("category", ""),
     }
 
 
@@ -167,6 +244,8 @@ def build_jsonld(page):
         blocks.append(bc)
     if page.get("jsonld") == "faq":
         blocks.append(faq_jsonld())
+    if page.get("jsonld") == "post":
+        blocks.append(post_jsonld(page))
     out = []
     for b in blocks:
         out.append('<script type="application/ld+json">\n'
@@ -195,8 +274,11 @@ def token_map(page):
         "{{SITE_TAGLINE}}": site["tagline"],
         "{{SITE_DESC}}": site["description"],
         "{{COPYRIGHT}}": site["copyright_holder"],
+        # 制定日は本公開日。未確定のうちは「本サイトの公開日」と明示する（嘘の日付を置かない）
+        "{{POLICY_DATE}}": site.get("policy_date") or "本サイトの公開日",
         "{{ORG_LEGAL}}": org["legal_name"],
         "{{ORG_REP}}": org["representative"],
+        "{{ORG_FOUNDED}}": org["founded"],
         "{{ORG_REG_NO}}": org["registration_no"],
         "{{ORG_TEL}}": org["tel"],
         "{{ORG_EMAIL}}": org["email"],
@@ -227,7 +309,7 @@ def write_sitemap():
         if p.get("robots", "").startswith("noindex"):
             continue
         loc = base + "/" + ("" if p["slug"] == "index" else p["slug"] + ".html")
-        pri = "1.0" if p["slug"] == "index" else "0.7"
+        pri = "1.0" if p["slug"] == "index" else p.get("priority", "0.7")
         urls.append("  <url><loc>{0}</loc><priority>{1}</priority></url>".format(loc, pri))
     xml = ('<?xml version="1.0" encoding="UTF-8"?>\n'
            '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
@@ -243,14 +325,56 @@ def write_robots():
     else:
         txt = ("User-agent: *\n"
                "Allow: /\n"
-               "Disallow: /members.html\n"
                "Sitemap: {0}/sitemap.xml\n".format(base))
     (DIST / "robots.txt").write_text(txt, encoding="utf-8")
 
 
+def safe_rmtree(target):
+    """rmtree の誤爆ガード。ROOT 直下の想定ディレクトリ以外は絶対に消さない。
+
+    パス定義のバグや将来の書き換えで ROOT 外（$HOME や /）を指した場合に、
+    黙って消さずその場で止める。破壊的操作は「消してよい根拠」を毎回確かめる。
+    """
+    if target.resolve().parent != ROOT.resolve() or target.name not in ("dist", "docs"):
+        sys.exit("中止: 想定外のディレクトリを削除しようとしました -> {0}".format(target))
+    if target.exists():
+        shutil.rmtree(target)
+
+
+# GitHub Pages の制御ファイル。dist/ には無いが docs/ には必要で、
+# 同期のたびに消すと Pages の挙動が変わる（CNAME を消すと独自ドメインが落ちる）。
+PAGES_CONTROL_FILES = (".nojekyll", "CNAME")
+
+
+def publish():
+    """dist/ の内容を docs/ へ同期する（GitHub Pages の公開ディレクトリが docs/ のため）。
+
+    ⚠️ docs/ を更新して push するとクライアント送信済みのプレビューURLに即反映される。
+    取締役の実物検証が済むまで実行しない（既定は build のみ）。
+    """
+    if not DIST.exists():
+        sys.exit("中止: dist/ が無い状態で publish しようとしました（先に build してください）")
+    # Pages 制御ファイルを退避してから入れ替え、あとで書き戻す
+    keep = {}
+    for name in PAGES_CONTROL_FILES:
+        src = DOCS / name
+        if src.exists():
+            keep[name] = src.read_bytes()
+    safe_rmtree(DOCS)
+    shutil.copytree(DIST, DOCS)
+    for name, data in keep.items():
+        (DOCS / name).write_bytes(data)
+    # .nojekyll は無いと _ 始まりのパスが無視される。退避が無ければ新規に作る。
+    nojekyll = DOCS / ".nojekyll"
+    if not nojekyll.exists():
+        nojekyll.write_bytes(b"")
+        keep.setdefault(".nojekyll", b"")
+    print("published: {0} -> {1}（保持: {2}）".format(
+        DIST, DOCS, ", ".join(sorted(keep)) or "なし"))
+
+
 def main():
-    if DIST.exists():
-        shutil.rmtree(DIST)
+    safe_rmtree(DIST)
     DIST.mkdir(parents=True)
     # assets コピー
     shutil.copytree(SRC / "assets", DIST / "assets")
@@ -262,6 +386,8 @@ def main():
     write_sitemap()
     write_robots()
     print("done. {0} pages -> {1}".format(len(PAGES), DIST))
+    if "--publish" in sys.argv:
+        publish()
 
 
 if __name__ == "__main__":

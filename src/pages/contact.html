@@ -13,9 +13,11 @@
         <h2 style="margin-top:0;">フォームからのお問い合わせ</h2>
         <p class="muted">下記フォームにご記入ください。担当者より折り返しご連絡いたします（通常2営業日以内）。</p>
 
-        <div class="form-status" role="status" aria-live="polite"></div>
-
         <form class="form" id="contact-form" data-endpoint="{{FORM_ENDPOINT}}" novalidate>
+          <!-- 送信結果の表示先。main.js が form.querySelector(".form-status") で探すため
+               必ず form の内側に置くこと（外に出すと status が null になり、成功も失敗も無反応になる） -->
+          <div class="form-status" role="status" aria-live="polite"></div>
+
           <!-- スパム対策(ハニーポット)。人間には見えない。bot が入力すると送信を破棄 -->
           <div class="hp-field" aria-hidden="true">
             <label for="f-website">このフィールドは空のままにしてください</label>
@@ -49,7 +51,7 @@
           </div>
           <div class="field">
             <label for="f-tel">電話番号</label>
-            <input type="tel" id="f-tel" name="電話" autocomplete="tel" placeholder="000-0000-0000">
+            <input type="tel" id="f-tel" name="電話" autocomplete="tel" placeholder="例）029-123-4567">
           </div>
           <div class="field">
             <label for="f-message">お問い合わせ内容<span class="req">必須</span></label>
@@ -70,14 +72,14 @@
 
       <aside>
         <div class="card">
-          <h3 style="margin-top:0;">お電話でのお問い合わせ</h3>
+          <h3 style="margin-top:0;">お電話・メールでのお問い合わせ</h3>
           <p style="font-size:1.4rem;font-weight:800;color:var(--navy);margin:6px 0;">{{ORG_TEL}}</p>
           <p class="muted" style="font-size:.85rem;">受付時間：{{ORG_HOURS}}</p>
-          <p class="placeholder-note">※ 電話番号は受注後に正式番号へ差し替えます。</p>
+          <p style="margin:10px 0 0;"><a href="mailto:{{ORG_EMAIL}}">{{ORG_EMAIL}}</a></p>
         </div>
         <div class="card" style="margin-top:20px;">
           <h3 style="margin-top:0;">対応エリア</h3>
-          <p>{{ORG_AREAS}}を中心に、茨城県・千葉県で対応しています。エリア外もまずはご相談ください。</p>
+          <p>{{ORG_AREAS}}を拠点に、茨城県・千葉県で対応しています。エリア外もまずはご相談ください。</p>
         </div>
         <div class="card" style="margin-top:20px;">
           <h3 style="margin-top:0;">よくあるご質問</h3>

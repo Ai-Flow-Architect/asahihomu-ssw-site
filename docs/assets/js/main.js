@@ -41,7 +41,10 @@
   /* ---------- お問い合わせフォーム バリデーション ---------- */
   var form = document.getElementById("contact-form");
   if (form) {
-    var status = form.querySelector(".form-status");
+    // .form-status は form の内側に置く前提だが、外に出ても無反応にならないよう保険を掛ける
+    // （null のまま進むと送信結果が一切表示されず、ユーザーには「押しても何も起きない」に見える）
+    var status = form.querySelector(".form-status")
+      || document.querySelector(".form-status");
     var endpoint = form.getAttribute("data-endpoint") || "";
 
     function setError(field, on) {
@@ -112,10 +115,10 @@
         if (status) { status.className = "form-status"; status.textContent = ""; }
         setTimeout(function () {
           if (status) {
-            status.classList.add("is-ok");
-            status.textContent = "【デモ表示】入力内容に問題はありません。本番では送信先を設定後、実際にお問い合わせが送信され、この位置に受付完了メッセージが表示されます。";
+            // 「送信された」と誤解させないこと。入力チェックが通っただけで、実際には何も送信していない。
+            status.className = "form-status is-err";
+            status.textContent = "【デモ表示】入力内容に問題はありませんでしたが、この画面は準備中のため お問い合わせは送信されていません。お急ぎの場合はお電話でご連絡ください。";
           }
-          form.reset();
           if (btn) { btn.disabled = false; btn.textContent = "この内容で送信する"; }
         }, 600);
         return;
@@ -142,16 +145,41 @@
     });
   }
 
-  /* ---------- 会員ページ（モック・受注前デモ） ---------- */
+  /* ---------- 資料ダウンロード登録（モック・配信基盤の確定前） ---------- */
   var login = document.getElementById("member-login");
   if (login) {
     login.addEventListener("submit", function (e) {
       e.preventDefault();
       var note = document.getElementById("member-note");
+
+      // 必須項目（メールアドレス・プライバシーポリシー同意）を検証してから進む。
+      // 検証せずにモック表示だけ出すと、同意を取らないままPIIを扱う導線になる。
+      var bad = false;
+      login.querySelectorAll("[required]").forEach(function (el) {
+        var v = (el.value || "").trim();
+        var ng = el.type === "checkbox" ? !el.checked : !v;
+        if (!ng && el.type === "email") {
+          ng = !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+        }
+        var wrap = el.closest(".field");
+        if (wrap) wrap.classList.toggle("is-invalid", ng);
+        if (ng) bad = true;
+      });
+      if (bad) {
+        if (note) {
+          note.className = "notice is-err";
+          note.style.display = "block";
+          note.textContent = "未入力または形式が正しくない項目があります。赤枠の項目をご確認ください。";
+        }
+        var firstBad = login.querySelector(".is-invalid input");
+        if (firstBad) firstBad.focus();
+        return;
+      }
       if (note) {
-        note.classList.add("is-ok");
+        // PIIを預かるフォームで「登録できた」と誤解させない。実際には送信も保存もしていない。
+        note.className = "notice is-err";
         note.style.display = "block";
-        note.textContent = "【デモ表示】本番では会員認証後、限定資料のダウンロードページに進みます。";
+        note.textContent = "【デモ表示】この画面は準備中のため、ご登録は受け付けられていません（入力内容は送信も保存もされていません）。公開後にあらためてご登録ください。";
       }
     });
   }
