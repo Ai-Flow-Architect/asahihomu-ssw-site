@@ -21,6 +21,7 @@
 """
 import html
 import json
+import re
 import shutil
 import sys
 from pathlib import Path
@@ -175,20 +176,28 @@ def org_jsonld():
     return data
 
 
+FAQ_Q_RE = re.compile(r'<button[^>]*class="faq__q"[^>]*>(.*?)</button>', re.S)
+FAQ_A_RE = re.compile(r'<div[^>]*class="faq__a"[^>]*>(.*?)</div>', re.S)
+TAG_RE = re.compile(r"<[^>]+>")
+
+
+def strip_tags(fragment):
+    """HTML断片を構造化データ用のプレーンテキストへ落とす。"""
+    return html.unescape(TAG_RE.sub("", fragment)).strip()
+
+
 def faq_jsonld():
-    # FAQページ用の構造化データ（src/pages/faq.html の質問と同期）
-    qa = [
-        ("特定技能と技能実習は何が違いますか？",
-         "技能実習は国際貢献・技能移転を目的とした制度ですが、特定技能は人手不足分野での就労を正面から認める在留資格です。特定技能は同一分野内での転職が可能で、即戦力としての就労を前提としています。"),
-        ("登録支援機関に委託すると何をしてもらえますか？",
-         "事前ガイダンスや生活オリエンテーション、公的手続きの同行、相談・苦情対応など、法律で義務づけられた10項目の支援を企業に代わって実施します。受け入れ企業の事務負担を大きく軽減できます。"),
-        ("費用はどのくらいかかりますか？",
-         "生活支援費は1名あたり月額15,000円です。一般的な団体では月額35,000円〜50,000円（当社調べ）のため、たとえば現在 月額35,000円で委託されている企業が10名を5年間受け入れる場合、1,200万円ほどの差が生まれます。なお、ここで比較しているのは月額の生活支援費のみです。初期費用やスポット対応の費用は受け入れ人数・分野によって異なりますので、無料でお見積りいたします。"),
-        ("受け入れまでどのくらいの期間が必要ですか？",
-         "海外からの新規入国か、国内在留者の切り替えかによって異なりますが、一般的に数か月程度を見込みます。スケジュールも含めて個別にご案内します。"),
-        ("茨城・千葉以外でも対応してもらえますか？",
-         "まずはお問い合わせください。対応可否を含めてご相談を承ります。"),
-    ]
+    # FAQページ用の構造化データは src/pages/faq.html から毎回生成する。
+    # 以前はここに質問・回答を手書きで複製していたが、本文だけ直した時に
+    # 静かにズレる（2026-08-01: 本文は相場を是正済なのに構造化データは旧相場のまま／
+    # 本文8問に対し構造化データ5問と件数まで乖離）。複製を持たなければズレようがない。
+    src = (SRC / "pages" / "faq.html").read_text(encoding="utf-8")
+    questions = [strip_tags(m) for m in FAQ_Q_RE.findall(src)]
+    answers = [strip_tags(m) for m in FAQ_A_RE.findall(src)]
+    if not questions or len(questions) != len(answers):
+        raise SystemExit(
+            f"[BUILD ERROR] faq.html の質問{len(questions)}件と回答{len(answers)}件が対応しません")
+    qa = list(zip(questions, answers))
     return {
         "@context": "https://schema.org",
         "@type": "FAQPage",
@@ -283,6 +292,8 @@ def token_map(page):
         "{{ORG_TEL}}": org["tel"],
         "{{ORG_EMAIL}}": org["email"],
         "{{ORG_HOURS}}": org["hours"],
+        # 支援受付は新規問い合わせと時間帯が別（2026-07-31 客様回答5）。未設定なら空文字で落とさない
+        "{{ORG_HOURS_SUPPORT}}": org.get("hours_support", ""),
         "{{ORG_ADDRESS}}": org["address"],
         "{{ORG_AREAS}}": " / ".join(org["areas"]),
         "{{FORM_ENDPOINT}}": CFG["contact"]["form_endpoint"],

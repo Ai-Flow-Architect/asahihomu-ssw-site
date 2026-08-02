@@ -13,6 +13,9 @@ __pycache__/
 shot.py
 screenshots/
 
+# 社内ナレッジ（このリポは public＝客様も見る。内部メモは絶対に載せない）
+KNOWLEDGE.md
+
 # ローカル確認用の一時物（dist はビルド成果物としてコミット可。除外したい場合は下行を有効化）
 # dist/
 

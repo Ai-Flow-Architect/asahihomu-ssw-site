@@ -148,6 +148,14 @@ FORBIDDEN = [
     "茨城労働保険管理協会",
     # 拠点は茨城のみ。千葉は「対応エリア」であって拠点ではない。
     "2拠点",
+    # 相場の旧表記。客様提供の出典2本は月額20,000〜40,000円（全国平均 約28,000円）で、
+    # 「35,000〜50,000円（当社調べ）」を裏づけない＝根拠を超えた比較広告になる。
+    # 2026-08-01 に本文8ページを是正したが構造化データだけ旧表記が生き残った（本検査の由来）。
+    # ※ pricing.html の「現在 月額35,000円で委託されている場合」は条件付き注記＝正しいので
+    #   数字単体ではなくレンジ表記そのものを禁止語にしている。
+    "35,000円〜50,000円",
+    "35,000〜50,000",
+    "当社調べ",
 ]
 
 
@@ -157,6 +165,53 @@ def check_forbidden():
         for pat in FORBIDDEN:
             if pat in txt:
                 fail("forbidden", "{0}: 「{1}」が混入".format(f.name, pat))
+
+
+# ---- 7b. FAQ 本文 ↔ 構造化データの一致 ----
+# 画面の本文だけ直して、Googleが読む構造化データに旧い金額が残る事故が実際に起きた
+# （2026-08-01・本文は是正済／構造化データは旧相場のまま＋件数も8対5でズレていた）。
+# build.py は faq.html から生成する作りに変えたが、将来また手書きの複製に戻した時に
+# 気づけるよう、完成HTMLの側で突合しておく。
+FAQ_Q_RE = re.compile(r'<button[^>]*class="faq__q"[^>]*>(.*?)</button>', re.S)
+FAQ_A_RE = re.compile(r'<div[^>]*class="faq__a"[^>]*>(.*?)</div>', re.S)
+
+
+def check_faq_sync():
+    import html as html_mod
+    f = DIST / "faq.html"
+    if not f.exists():
+        fail("faq_sync", "dist/faq.html が無い")
+        return
+    txt = f.read_text(encoding="utf-8")
+
+    def plain(fragment):
+        return html_mod.unescape(re.sub(r"<[^>]+>", "", fragment)).strip()
+
+    body = [(plain(q), plain(a))
+            for q, a in zip(FAQ_Q_RE.findall(txt), FAQ_A_RE.findall(txt))]
+    ld = []
+    for block in re.findall(
+            r'<script type="application/ld\+json">(.*?)</script>', txt, re.S):
+        try:
+            data = json.loads(block)
+        except ValueError:
+            continue  # 解析不能は check_jsonld が報告する
+        if data.get("@type") == "FAQPage":
+            ld = [(e["name"], e["acceptedAnswer"]["text"])
+                  for e in data.get("mainEntity", [])]
+    if not body:
+        fail("faq_sync", "faq.html から質問を1件も抽出できない（クラス名の変更を疑う）")
+        return
+    if not ld:
+        fail("faq_sync", "faq.html に FAQPage 構造化データが無い")
+        return
+    if len(body) != len(ld):
+        fail("faq_sync",
+             "faq.html: 本文{0}問に対し構造化データ{1}問（件数が不一致）".format(len(body), len(ld)))
+    for q, a in body:
+        if (q, a) not in ld:
+            fail("faq_sync", "faq.html: 「{0}」の本文と構造化データが一致しない".format(q[:24]))
+    notes.append("FAQ {0} 問を本文↔構造化データで突合".format(len(body)))
 
 
 # ---- 8. 冪等性 ----
@@ -250,6 +305,7 @@ def main():
     check_sitemap()
     check_placeholders()
     check_forbidden()
+    check_faq_sync()
     check_idempotent()
 
     for n in notes:
