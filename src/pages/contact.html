@@ -23,6 +23,9 @@
             <label for="f-website">このフィールドは空のままにしてください</label>
             <input type="text" id="f-website" name="website" tabindex="-1" autocomplete="off">
           </div>
+          <!-- 通知メールの件名（Formspree 等のフォームサービスが解釈する標準フィールド。
+               対応しないサービスでは単に無視される）。送信先は site.json contact.form_endpoint -->
+          <input type="hidden" name="_subject" value="【あさひほうむ 特定技能サポートHP】お問い合わせ">
           <div class="field">
             <label for="f-type">お問い合わせ種別<span class="req">必須</span></label>
             <select id="f-type" name="種別" required>

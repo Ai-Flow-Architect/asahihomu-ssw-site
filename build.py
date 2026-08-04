@@ -297,6 +297,9 @@ def token_map(page):
         "{{ORG_ADDRESS}}": org["address"],
         "{{ORG_AREAS}}": " / ".join(org["areas"]),
         "{{FORM_ENDPOINT}}": CFG["contact"]["form_endpoint"],
+        # 資料ダウンロード（メール登録で即DL）。未設定のうちは空文字＝main.js がモック動作に落とす
+        "{{DL_ENDPOINT}}": CFG.get("download", {}).get("form_endpoint", ""),
+        "{{GUIDEBOOK_URL}}": CFG.get("download", {}).get("guidebook_url", ""),
     }
 
 

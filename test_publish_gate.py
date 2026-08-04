@@ -21,7 +21,9 @@ PY = sys.executable
 # 本番モードで必ず検出されるべき項目（preview=false にしただけで全部出る状態が今）
 EXPECT = [
     "policy_date",       # PP制定日 未設定
-    "form_endpoint",     # 送信先 未設定
+    "contact.form_endpoint",   # お問い合わせの送信先 未設定
+    "download.form_endpoint",  # 資料DL登録の送信先 未設定
+    "download.guidebook_url",  # ガイドブックPDF 未配置
     "デモ表示",           # 制作途中の文言
     "掲載見本",
     "準備中",

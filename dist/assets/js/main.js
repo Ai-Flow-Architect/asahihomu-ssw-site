@@ -145,9 +145,20 @@
     });
   }
 
-  /* ---------- 資料ダウンロード登録（モック・配信基盤の確定前） ---------- */
+  /* ---------- 資料ダウンロード登録（メール登録で即DL・承認制にしない） ----------
+     site.json の download.form_endpoint（登録の送信先）と download.guidebook_url（PDF）が
+     両方設定されると本番動作＝登録成功→その場でダウンロード導線を表示する。
+     どちらかが未設定（PDF現物・フォームサービスの鍵が未着）のうちはモック動作。 */
   var login = document.getElementById("member-login");
   if (login) {
+    var dlEndpoint = login.getAttribute("data-endpoint") || "";
+    var dlFile = login.getAttribute("data-file") || "";
+    var dlLive = Boolean(dlEndpoint && dlFile);
+    var dlBtn = login.querySelector('button[type="submit"]');
+    if (dlLive && dlBtn) {
+      // 本番動作では「登録→即ダウンロード」なので、ボタン文言も実際の動きに合わせる
+      dlBtn.textContent = "ガイドブックをダウンロードする";
+    }
     login.addEventListener("submit", function (e) {
       e.preventDefault();
       var note = document.getElementById("member-note");
@@ -175,12 +186,44 @@
         if (firstBad) firstBad.focus();
         return;
       }
-      if (note) {
-        // PIIを預かるフォームで「登録できた」と誤解させない。実際には送信も保存もしていない。
-        note.className = "notice is-err";
-        note.style.display = "block";
-        note.textContent = "【デモ表示】この画面は準備中のため、ご登録は受け付けられていません（入力内容は送信も保存もされていません）。公開後にあらためてご登録ください。";
+      // 配信基盤が未確定のうちはモック動作。
+      // PIIを預かるフォームで「登録できた」と誤解させない。実際には送信も保存もしていない。
+      if (!dlLive) {
+        if (note) {
+          note.className = "notice is-err";
+          note.style.display = "block";
+          note.textContent = "【デモ表示】この画面は準備中のため、ご登録は受け付けられていません（入力内容は送信も保存もされていません）。公開後にあらためてご登録ください。";
+        }
+        return;
       }
+
+      // 本番動作: 登録を送信し、成功したらその場でダウンロード導線を表示する（即DL・承認なし）
+      if (dlBtn) { dlBtn.disabled = true; dlBtn.textContent = "送信中…"; }
+      fetch(dlEndpoint, {
+        method: "POST",
+        headers: { "Accept": "application/json" },
+        body: new FormData(login)
+      }).then(function (res) {
+        if (!res.ok) throw new Error("register failed");
+        var ready = document.getElementById("dl-ready");
+        var link = document.getElementById("dl-link");
+        if (link) link.setAttribute("href", dlFile);
+        if (ready) ready.style.display = "block";
+        if (note) {
+          note.className = "notice is-ok";
+          note.style.display = "block";
+          note.textContent = "ご登録ありがとうございます。下のご案内からガイドブックをダウンロードいただけます。";
+        }
+        if (ready && ready.scrollIntoView) ready.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }).catch(function () {
+        if (note) {
+          note.className = "notice is-err";
+          note.style.display = "block";
+          note.textContent = "送信に失敗しました。お手数ですが、時間をおいてもう一度お試しいただくか、お問い合わせフォームからご連絡ください。";
+        }
+      }).finally(function () {
+        if (dlBtn) { dlBtn.disabled = false; dlBtn.textContent = "ガイドブックをダウンロードする"; }
+      });
     });
   }
 

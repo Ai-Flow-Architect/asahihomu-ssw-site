@@ -125,6 +125,13 @@ def check_placeholders():
             fail("placeholder", "site.json policy_date（PP制定日）が未設定のまま本公開しようとしている")
         if not CFG["contact"].get("form_endpoint"):
             fail("placeholder", "contact.form_endpoint 未設定のまま本公開しようとしている（フォームがモック動作になる）")
+        # 資料DL（メール登録で即DL）は 送信先＋PDF の両方が揃って初めて本番動作になる。
+        # 「準備中」文言だけ差し替えて設定を忘れると、登録しても何も配れないページになる。
+        dl = CFG.get("download", {})
+        if not dl.get("form_endpoint"):
+            fail("placeholder", "download.form_endpoint 未設定のまま本公開しようとしている（資料DL登録がモック動作になる）")
+        if not dl.get("guidebook_url"):
+            fail("placeholder", "download.guidebook_url 未設定のまま本公開しようとしている（ガイドブックPDF未配置＝即DL導線が動かない）")
         # 制作途中であることが読み手に伝わる文言＝残すと信頼を損なう（4AI-check 2026-07-21 指摘）
         # 「雛形」はプライバシーポリシーに残った社内向け注記（harden 2026-07-21 で発見）
         for pat in ["デモ表示", "掲載見本", "準備中", "現在は業種・地域のみ",
