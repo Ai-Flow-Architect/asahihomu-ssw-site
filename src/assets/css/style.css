@@ -380,3 +380,8 @@ textarea:focus-visible, .faq__q:focus-visible, .nav-toggle:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   * { scroll-behavior: auto !important; transition: none !important; }
 }
+
+/* 動画ページの目次（videos.html）。YouTube ID を設定した本にだけ出る */
+.chapter-list { list-style: none; padding: 0; margin: 8px 0 0; }
+.chapter-list li { padding: 4px 0; border-bottom: 1px solid #eef1f5; font-size: .92rem; }
+.chapter-list__t { display: inline-block; min-width: 4.2em; color: #1b3a5b; font-variant-numeric: tabular-nums; }

@@ -87,6 +87,11 @@ PAGES = [
      "title": "お問い合わせ｜あさひほうむ 特定技能サポート",
      "desc": "特定技能外国人材の受け入れ・登録支援機関への委託に関するご相談・お見積りはこちらから。お気軽にお問い合わせください。",
      "jsonld": "contact"},
+    # 動画で知る特定技能（フル設計 B2／EVM-8 の掲載先）。YouTube ID 未設定のうちは準備中表示
+    {"slug": "videos", "name": "動画で知る特定技能",
+     "title": "動画で知る特定技能｜あさひほうむ 特定技能サポート",
+     "desc": "特定技能の制度、支援機関の選び方、受け入れ現場の実際を、社会保険労務士がインタビュー形式で解説します。",
+     "jsonld": None, "priority": "0.8"},
     # メール登録だけで即ダウンロード（承認制にしない＝客様ご指定）＝リード獲得ページなので検索対象にする
     {"slug": "members", "name": "資料ダウンロード",
      "title": "特定技能 受け入れガイドブック（無料）｜あさひほうむ",
@@ -279,6 +284,46 @@ def build_jsonld(page):
     return "\n".join(out)
 
 
+def video_blocks():
+    """site.json videos.items から動画セクションのHTMLを組む。
+
+    youtube_id が空の本は埋め込み iframe も目次も出さず「準備中」だけを出す。
+    ＝公開後に直せない誤ったURLを載せないための既定値（members の準備中表示と同じ考え方）。
+    """
+    import html as _html
+
+    vids = CFG.get("videos", {}).get("items", [])
+    if not vids:
+        return '<p class="placeholder-note">※ 動画は準備中です。</p>'
+    out = []
+    for i, v in enumerate(vids, 1):
+        t = _html.escape(v["title"])
+        lead = _html.escape(v["lead"])
+        dur = _html.escape(v["duration"])
+        yid = (v.get("youtube_id") or "").strip()
+        parts = ['<article class="card" style="margin-bottom:32px;">']
+        parts.append('<h2 style="margin-top:0;">%d. %s</h2>' % (i, t))
+        parts.append('<p class="muted">%s（%s）</p>' % (lead, dur))
+        if yid:
+            parts.append(
+                '<div style="position:relative;padding-top:56.25%%;margin:16px 0;">'
+                '<iframe src="https://www.youtube-nocookie.com/embed/%s" title="%s" '
+                'loading="lazy" allowfullscreen '
+                'style="position:absolute;inset:0;width:100%%;height:100%%;border:0;"></iframe></div>'
+                % (_html.escape(yid), t))
+            parts.append('<h3>目次</h3><ul class="chapter-list">')
+            for c in v.get("chapters", []):
+                parts.append('<li><span class="chapter-list__t">%s</span> %s</li>'
+                             % (_html.escape(c["t"]), _html.escape(c["label"])))
+            parts.append("</ul>")
+        else:
+            parts.append('<p class="placeholder-note">※ この動画は現在準備中です。'
+                         '公開でき次第、このページでご覧いただけます。</p>')
+        parts.append("</article>")
+        out.append("\n".join(parts))
+    return "\n".join(out)
+
+
 def token_map(page):
     site = CFG["site"]
     org = CFG["org"]
@@ -316,6 +361,8 @@ def token_map(page):
         # 資料ダウンロード（メール登録で即DL）。未設定のうちは空文字＝main.js がモック動作に落とす
         "{{DL_ENDPOINT}}": CFG.get("download", {}).get("form_endpoint", ""),
         "{{GUIDEBOOK_URL}}": CFG.get("download", {}).get("guidebook_url", ""),
+        # 動画一覧。YouTube ID が空の本は埋め込まず「準備中」を出す（誤ったURLを載せないため）
+        "{{VIDEO_BLOCKS}}": video_blocks(),
     }
 
 

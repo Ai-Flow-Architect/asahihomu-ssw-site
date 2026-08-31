@@ -145,7 +145,7 @@
         <!-- data-endpoint / data-file は site.json の download 設定から差し込まれる。
              両方が設定されると main.js が「登録→即ダウンロード」の本番動作に切り替わる。
              未設定（PDF現物・フォームサービスの鍵が未着）のうちはモック動作＝デモ表示。 -->
-        <form class="form" id="member-login" data-endpoint="" data-file="" novalidate style="margin-top:16px;">
+        <form class="form" id="member-login" data-endpoint="" data-file="assets/docs/tokutei-ginou-guidebook.pdf" novalidate style="margin-top:16px;">
           <div class="field">
             <label for="m-company">会社名・団体名</label>
             <input type="text" id="m-company" name="会社名" autocomplete="organization">
@@ -185,9 +185,11 @@
         <div class="card">
           <h3 style="margin-top:0;">ご用意している資料</h3>
           <ul class="dl-list" style="margin-top:14px;">
-            <li><span>📘 特定技能 受け入れガイドブック</span><span class="tag">準備中</span></li>
+            <li><span>📘 特定技能ガイドブック（事業者の方へ・全49ページ）</span><span class="tag">準備中</span></li>
           </ul>
-          <p class="muted" style="font-size:.82rem;margin-top:12px;">※ まずはガイドブックからご用意し、資料は順次追加していきます。</p>
+          <p class="muted" style="font-size:.82rem;margin-top:12px;">制度のしくみ・雇用の流れ・必要書類の記載例・よくある質問まで、受け入れの全体像が1冊にまとまった資料です。</p>
+          <p class="muted" style="font-size:.78rem;margin-top:8px;">出典：出入国在留管理庁「特定技能ガイドブック」（<a href="https://www.moj.go.jp/isa/applications/ssw/index.html" target="_blank" rel="noopener">出入国在留管理庁「特定技能制度」</a>）</p>
+          <p class="muted" style="font-size:.82rem;margin-top:12px;">※ 資料は順次追加していきます。</p>
         </div>
 
         <div class="card" style="margin-top:20px;">
@@ -200,6 +202,34 @@
         </div>
       </aside>
     </div>
+  </div>
+</section>
+
+<section class="section section--soft">
+  <div class="container">
+    <h2>外国人の受け入れに役立つ公的資料（外部リンク）</h2>
+    <p class="muted">国が公開している資料をまとめました。いずれも公式サイトへのリンクです。改訂されても常に最新版をご覧いただけます。</p>
+
+    <div class="grid grid--2" style="align-items:start;margin-top:24px;">
+      <div class="card">
+        <h3 style="margin-top:0;">事業者の方へ</h3>
+        <ul class="dl-list" style="margin-top:14px;">
+          <li><span><a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/koyou_roudou/koyou/index_00008.html" target="_blank" rel="noopener">事業者向け受入れ・定着マニュアル ～外国人と一緒にはたらくために～</a><br><span class="muted" style="font-size:.8rem;">厚生労働省／全91ページ</span></span></li>
+          <li><span><a href="https://www.moj.go.jp/isa/support/coexistence/04_00078.html" target="_blank" rel="noopener">生活オリエンテーション動画</a><br><span class="muted" style="font-size:.8rem;">出入国在留管理庁／受け入れ時の説明にそのまま使えます</span></span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-top:0;">働く外国人ご本人へ</h3>
+        <ul class="dl-list" style="margin-top:14px;">
+          <li><span><a href="https://www.moj.go.jp/isa/support/portal/guidebook_all.html" target="_blank" rel="noopener">生活・就労ガイドブック（多言語）</a><br><span class="muted" style="font-size:.8rem;">出入国在留管理庁／日本語のほか英語・ベトナム語・インドネシア語・フィリピノ語・ミャンマー語・クメール語など</span></span></li>
+          <li><span><a href="https://www.moj.go.jp/isa/support/portal/index.html" target="_blank" rel="noopener">外国人生活支援ポータルサイト</a><br><span class="muted" style="font-size:.8rem;">出入国在留管理庁／相談窓口・手続の入口</span></span></li>
+          <li><span><a href="https://portal.jp-mirai.org/ja" target="_blank" rel="noopener">JP-MIRAI ポータル</a><br><span class="muted" style="font-size:.8rem;">外国人労働者向けの生活情報・相談窓口</span></span></li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="muted" style="font-size:.8rem;margin-top:20px;">※ 外部サイトの内容については、各運営者の責任において提供されています。リンク先は2026年8月31日時点で公開を確認しています。</p>
   </div>
 </section>
 
@@ -232,6 +262,7 @@
           <li><a href="blog.html">お役立ち情報</a></li>
           <li><a href="faq.html">よくある質問</a></li>
           <li><a href="about-us.html">事務所紹介</a></li>
+          <li><a href="videos.html">動画で知る特定技能</a></li>
           <li><a href="members.html">資料ダウンロード</a></li>
           <li><a href="privacy.html">プライバシーポリシー</a></li>
         </ul>
