@@ -284,6 +284,37 @@ def build_jsonld(page):
     return "\n".join(out)
 
 
+def download_texts():
+    """資料ダウンロードページの文言を site.json の download 設定から機械で決める。
+
+    手で「準備中」と書くと、PDF が届いても文言だけが古いまま残る（2026-09-02 実際に発生＝
+    8/31 にPDFを配置したのにページは「ガイドブックは現在準備中です」と言い続けていた）。
+    ＝配れるかどうかは PDF現物(guidebook_url) と 送信先(form_endpoint) の両方で決まるので、
+    その2つだけを唯一の正にして、文言はここから出す。
+    """
+    dl = CFG.get("download", {})
+    ready = bool(dl.get("guidebook_url")) and bool(dl.get("form_endpoint"))
+    if ready:
+        return {
+            "{{DL_LEAD}}": "特定技能の受け入れに役立つ資料を、無料でご用意しています。<br>"
+                           "メールアドレスのご登録だけで、その場でダウンロードいただけます。",
+            "{{DL_STATUS}}": '<p class="muted">ご登録いただくと、その場でガイドブックを'
+                             'ダウンロードいただけます。あわせて、今後の資料や制度改正の'
+                             'お知らせをメールでお届けします。</p>',
+            "{{DL_TAG}}": '<span class="tag">ダウンロードできます</span>',
+        }
+    # 未設定のうちは main.js もモック動作に落ちる＝画面の文言と実際の挙動を一致させる
+    return {
+        "{{DL_LEAD}}": "特定技能の受け入れに役立つ資料を、無料でご用意しています。<br>"
+                       "ご登録の受付は準備中です。開始しだい、このページからご案内します。",
+        "{{DL_STATUS}}": '<p class="muted">ただいまご登録の受付を準備中です。'
+                         '受付を開始しましたら、ご登録のその場でダウンロードいただけます。</p>\n'
+                         '        <p class="placeholder-note">※ ご登録の受付は、本番ドメインと'
+                         'フォームの設定後に有効化します。現在はデモ表示です。</p>',
+        "{{DL_TAG}}": '<span class="tag">受付準備中</span>',
+    }
+
+
 def video_blocks():
     """site.json videos.items から動画セクションのHTMLを組む。
 
@@ -363,6 +394,8 @@ def token_map(page):
         "{{GUIDEBOOK_URL}}": CFG.get("download", {}).get("guidebook_url", ""),
         # 動画一覧。YouTube ID が空の本は埋め込まず「準備中」を出す（誤ったURLを載せないため）
         "{{VIDEO_BLOCKS}}": video_blocks(),
+        # 資料DLページの文言。PDF現物と送信先の2つから機械で決める（手打ちの stale を作らない）
+        **download_texts(),
     }
 
 

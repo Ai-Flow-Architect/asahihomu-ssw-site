@@ -2,7 +2,7 @@
   <div class="container">
     <nav class="breadcrumb" aria-label="パンくず"><a href="index.html">ホーム</a><span>›</span>資料ダウンロード</nav>
     <h1>資料ダウンロード</h1>
-    <p>特定技能の受け入れに役立つ資料を、無料でご用意しています。<br>第1弾のガイドブックは現在準備中です。ご登録いただいた方から、公開時にご案内します。</p>
+    <p>{{DL_LEAD}}</p>
   </div>
 </section>
 
@@ -11,14 +11,14 @@
     <div class="grid grid--2" style="align-items:start;">
       <div>
         <h2 style="margin-top:0;">メールアドレスのご登録だけ。審査も承認もありません</h2>
-        <p class="muted">ガイドブックは現在準備中です。ご登録いただいた方には、公開でき次第いちばんにご案内します。公開後は、ご登録のその場でダウンロードいただけます。</p>
-        <p class="placeholder-note">※ 資料の配信は、本番ドメイン・サーバーの確定後に有効化します。現在はデモ表示です。</p>
+        {{DL_STATUS}}
 
         <div class="notice" id="member-note" style="display:none;margin:16px 0;"></div>
 
         <!-- data-endpoint / data-file は site.json の download 設定から差し込まれる。
              両方が設定されると main.js が「登録→即ダウンロード」の本番動作に切り替わる。
-             未設定（PDF現物・フォームサービスの鍵が未着）のうちはモック動作＝デモ表示。 -->
+             どちらかが未設定のうちは main.js がモック動作に落ち、上の文言も
+             build.py の download_texts() が受付前の表示に切り替える。 -->
         <form class="form" id="member-login" data-endpoint="{{DL_ENDPOINT}}" data-file="{{GUIDEBOOK_URL}}" novalidate style="margin-top:16px;">
           <div class="field">
             <label for="m-company">会社名・団体名</label>
@@ -59,7 +59,7 @@
         <div class="card">
           <h3 style="margin-top:0;">ご用意している資料</h3>
           <ul class="dl-list" style="margin-top:14px;">
-            <li><span>📘 特定技能ガイドブック（事業者の方へ・全49ページ）</span><span class="tag">準備中</span></li>
+            <li><span>📘 特定技能ガイドブック（事業者の方へ・全49ページ）</span>{{DL_TAG}}</li>
           </ul>
           <p class="muted" style="font-size:.82rem;margin-top:12px;">制度のしくみ・雇用の流れ・必要書類の記載例・よくある質問まで、受け入れの全体像が1冊にまとまった資料です。</p>
           <p class="muted" style="font-size:.78rem;margin-top:8px;">出典：出入国在留管理庁「特定技能ガイドブック」（<a href="https://www.moj.go.jp/isa/applications/ssw/index.html" target="_blank" rel="noopener">出入国在留管理庁「特定技能制度」</a>）</p>
