@@ -161,6 +161,107 @@ PAGES = [
      "parent": {"slug": "blog", "name": "お役立ち情報"}, "priority": "0.6"},
 ]
 
+# ---- CMS 記事（microCMS → fetch_cms.py → content/cms_posts.json）----
+# JSON が無ければ 0 件＝従来どおり静的記事だけでビルドされる（鍵なしフォールバック）。
+CMS_JSON = ROOT / "content" / "cms_posts.json"
+SLUG_RE = re.compile(r"^[a-z0-9-]{3,60}$")
+DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+
+UNSAFE_TAG_RE = re.compile(r"<\s*(script|object|embed|form|meta|link|style)\b", re.I)
+EVENT_ATTR_RE = re.compile(r"\son[a-z]+\s*=", re.I)
+JS_URL_RE = re.compile(r"(href|src)\s*=\s*[\"']?\s*(javascript|data|vbscript):", re.I)
+IFRAME_RE = re.compile(r"<\s*iframe\b[^>]*\bsrc\s*=\s*[\"']([^\"']*)", re.I)
+IFRAME_OK = ("https://www.youtube.com/embed/", "https://www.youtube-nocookie.com/embed/")
+
+
+def unsafe_html(body):
+    """客様1名の入力でも、スクリプトを実行できる要素は通さない（信頼境界の最低限）。
+
+    リッチエディタが出す通常のHTML（p/h2/ul/img/a/strong…）と YouTube 埋め込みは通す。
+    戻り値は理由の文字列（安全なら空文字）。
+    """
+    m = UNSAFE_TAG_RE.search(body)
+    if m:
+        return "<%s>" % m.group(1).lower()
+    if EVENT_ATTR_RE.search(body):
+        return "on*= 属性"
+    if JS_URL_RE.search(body):
+        return "javascript:/data: URL"
+    for m in IFRAME_RE.finditer(body):
+        if not m.group(1).startswith(IFRAME_OK):
+            return "YouTube 以外の iframe (%s)" % m.group(1)[:40]
+    return ""
+
+
+def load_cms_posts():
+    """content/cms_posts.json を PAGES 形式へ。1件でも不正なら止める（誤ったURLを公開しない）。"""
+    if not CMS_JSON.exists():
+        return []
+    posts = json.loads(CMS_JSON.read_text(encoding="utf-8")).get("posts", [])
+    static_slugs = {p["slug"] for p in PAGES}
+    seen, pages = set(), []
+    for p in posts:
+        slug = p.get("slug", "")
+        if not SLUG_RE.match(slug):
+            sys.exit("中止: CMS記事の slug が不正（半角英数ハイフン3〜60字）: %r" % slug)
+        full = "blog-" + slug
+        if full in static_slugs or full in seen:
+            sys.exit("中止: CMS記事の slug が既存ページまたは他の記事と重複: %r" % slug)
+        seen.add(full)
+        if not p.get("title", "").strip():
+            sys.exit("中止: CMS記事 %r のタイトルが空" % slug)
+        if not DATE_RE.match(p.get("date", "")):
+            sys.exit("中止: CMS記事 %r の日付が YYYY-MM-DD でない: %r" % (slug, p.get("date")))
+        bad = unsafe_html(p.get("body", ""))
+        if bad:
+            sys.exit("中止: CMS記事 %r の本文に許可しない要素: %s" % (slug, bad))
+        title = p["title"].strip()
+        pages.append({
+            "slug": full, "name": title,
+            "title": title + "｜あさひほうむ 特定技能サポート",
+            "desc": p.get("description", "").strip() or title,
+            "jsonld": "post", "date": p["date"], "category": p.get("category", ""),
+            "parent": {"slug": "blog", "name": "お役立ち情報"}, "priority": "0.6",
+            "cms": True, "body": p.get("body", ""), "eyecatch": p.get("eyecatch", ""),
+        })
+    # 新しい記事が先（一覧カードの並び順もこれに従う）
+    return sorted(pages, key=lambda x: x["date"], reverse=True)
+
+
+CMS_PAGES = load_cms_posts()
+PAGES += CMS_PAGES
+
+
+def cms_post_html(page):
+    """CMS記事の本文を src/templates/post.html に流し込む（blog-*.html と同じ骨格）。"""
+    tpl = (SRC / "templates" / "post.html").read_text(encoding="utf-8")
+    eye = ""
+    if page["eyecatch"]:
+        eye = '<p><img src="%s" alt="" loading="lazy" style="width:100%%;border-radius:12px;"></p>' % (
+            html.escape(page["eyecatch"], quote=True))
+    return (tpl.replace("{{POST_TITLE}}", html.escape(page["name"]))
+            .replace("{{POST_CATEGORY}}", html.escape(page["category"]))
+            .replace("{{POST_DATE}}", page["date"].replace("-", "."))
+            .replace("{{POST_EYECATCH}}", eye)
+            .replace("{{POST_BODY}}", page["body"]))
+
+
+def cms_post_cards():
+    """blog.html 一覧の先頭に差し込むカード（date 降順・静的カードはその後ろに残る）。"""
+    cards = []
+    for p in CMS_PAGES:
+        cards.append(
+            '<article class="card post">\n'
+            '        <span class="tag tag--field">%s</span>\n'
+            '        <p class="post__meta">%s</p>\n'
+            '        <h3><a href="%s.html">%s</a></h3>\n'
+            '        <p class="muted">%s</p>\n'
+            '      </article>' % (
+                html.escape(p["category"]), p["date"].replace("-", "."),
+                p["slug"], html.escape(p["name"]), html.escape(p["desc"])))
+    return "".join("\n      " + c for c in cards)
+
 
 def nav_html(current_slug):
     desk, mob = [], []
@@ -264,6 +365,7 @@ def post_jsonld(page):
         "publisher": {"@type": "Organization", "name": site["name"],
                       "url": site["base_url"]},
         "articleSection": page.get("category", ""),
+        **({"image": page["eyecatch"]} if page.get("eyecatch") else {}),
     }
 
 
@@ -394,13 +496,18 @@ def token_map(page):
         "{{GUIDEBOOK_URL}}": CFG.get("download", {}).get("guidebook_url", ""),
         # 動画一覧。YouTube ID が空の本は埋め込まず「準備中」を出す（誤ったURLを載せないため）
         "{{VIDEO_BLOCKS}}": video_blocks(),
+        # お役立ち情報 一覧の先頭に CMS 記事のカード（0件なら空）
+        "{{CMS_POST_CARDS}}": cms_post_cards(),
         # 資料DLページの文言。PDF現物と送信先の2つから機械で決める（手打ちの stale を作らない）
         **download_texts(),
     }
 
 
 def render(page, base):
-    content = (SRC / "pages" / (page["slug"] + ".html")).read_text(encoding="utf-8")
+    if page.get("cms"):
+        content = cms_post_html(page)
+    else:
+        content = (SRC / "pages" / (page["slug"] + ".html")).read_text(encoding="utf-8")
     nav_d, nav_m = nav_html(page["slug"])
     html = base
     html = html.replace("{{JSONLD}}", build_jsonld(page))

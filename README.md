@@ -71,6 +71,35 @@ python3 build.py
 6. **Search Console 登録** … 御社アカウントでの実登録
 7. **お客様の声・実績** … 掲載許諾を得た実データへ差し替え
 
+## お役立ち情報の更新（CMS＝microCMS ＋ GitHub Actions）
+
+記事は microCMS の「お役立ち情報（posts）」で書き、公開ボタンを押すだけでサイトに載ります。
+
+### 月1回の操作（3手）
+1. microCMS にログイン →「お役立ち情報（posts）」→「追加」
+2. タイトル・カテゴリ・本文を書く。URL用の `slug` は半角英数字とハイフンで短く（例 `visa-renewal`）
+3. 「公開」を押す → 数分後にサイトの「お役立ち情報」に載る（他の操作は不要）
+
+### 気をつけること
+- **公開後に `slug` を変えない・公開した記事を削除や下書きに戻さない**（元のURLが開けなくなります）。直したい・消したい時は制作側へご連絡ください（内容の修正はそのまま上書きして公開すれば反映されます）
+- 本文には YouTube の埋め込み・画像・見出し・箱組みが使えます。それ以外の埋め込み（外部の iframe やスクリプト）は安全のため載りません
+- 「公開」を押して10分たっても載らない時は制作側へご連絡ください（自動ビルドの失敗は制作側へ通知が届きます）
+
+### 仕組み（制作側メモ）
+```
+microCMS で公開 → Webhook(GitHub Actions 連携・event: cms-update)
+  → .github/workflows/build.yml
+     fetch_cms.py --require-key   … 記事を全件取得 → content/cms_posts.json
+     build.py                     … 既存の PAGES に記事を足して dist/ 生成
+     checks.py                    … 機械検査（赤なら docs/ に触らず終了）
+     build.py --publish           … dist/ → docs/（.nojekyll/CNAME は保持）
+     git commit / push            … content/cms_posts.json ＋ docs/
+```
+- 鍵は GitHub Secrets（`MICROCMS_SERVICE_DOMAIN` / `MICROCMS_API_KEY`＝GET専用）だけ。ローカルで鍵が無い時は既存記事だけでビルドされる
+- `content/cms_posts.json` はコミットする＝ローカル再現と記事データの持ち出し（将来の移設）のため
+- workflow は push では走らない（repository_dispatch / 手動のみ）。`site.json` の preview・CNAME には触らない
+- 検証: `python3 test_cms.py`（T1〜T9）／`python3 test_cms_mutation.py`（守りを外すと赤くなる実証）
+
 ## 技術メモ
 
 - 依存ライブラリ・ビルドツールなし（Python標準ライブラリのみ）。どの静的ホストにもそのまま載る。

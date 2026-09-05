@@ -1,0 +1,53 @@
+# microCMS で記事を「公開」→ Webhook(GitHub Actions 連携) → この workflow → docs/ を更新
+#
+# - push では走らない（当方の通常コミットで docs/ を勝手に書き換えない）
+# - 手順: 取得 → ビルド → 機械検査（赤なら docs/ に触らず終了）→ docs/ 同期 → コミット
+# - site.json（preview / base_url）と CNAME には触らない。本公開の切替は人が行う
+# - Secrets: MICROCMS_SERVICE_DOMAIN / MICROCMS_API_KEY（GET専用キー）
+name: cms-build
+
+on:
+  repository_dispatch:
+    types: [cms-update]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: cms-publish
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 記事を取得（CI では鍵必須＝Secrets 失効を「成功」で見逃さない）
+        env:
+          MICROCMS_SERVICE_DOMAIN: ${{ secrets.MICROCMS_SERVICE_DOMAIN }}
+          MICROCMS_API_KEY: ${{ secrets.MICROCMS_API_KEY }}
+        run: python3 fetch_cms.py --require-key
+
+      - name: ビルド
+        run: python3 build.py
+
+      - name: 機械検査（赤ならここで停止＝docs/ は前回のまま）
+        run: python3 checks.py
+
+      - name: docs/ へ同期
+        run: python3 build.py --publish
+
+      - name: 差分があればコミット
+        run: |
+          git config user.name "cms-build[bot]"
+          git config user.email "cms-build@users.noreply.github.com"
+          git add content/cms_posts.json docs
+          if git diff --cached --quiet; then
+            echo "差分なし（記事の変更がサイトに影響していない）"
+            exit 0
+          fi
+          git commit -m "cms: microCMS の記事を反映（自動ビルド）"
+          git push

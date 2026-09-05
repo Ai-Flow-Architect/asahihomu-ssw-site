@@ -134,9 +134,18 @@ def check_placeholders():
             fail("placeholder", "download.guidebook_url 未設定のまま本公開しようとしている（ガイドブックPDF未配置＝即DL導線が動かない）")
         # 制作途中であることが読み手に伝わる文言＝残すと信頼を損なう（4AI-check 2026-07-21 指摘）
         # 「雛形」はプライバシーポリシーに残った社内向け注記（harden 2026-07-21 で発見）
+        # CMS 記事（客様が書く本文）は対象外＝客様が「準備中」と書いただけで自動公開を
+        # 止めない（誤検知でゲートがオオカミ少年化するのを防ぐ）。対象は当方の静的ページのみ。
+        cms_names = set()
+        cms_json = ROOT / "content" / "cms_posts.json"
+        if cms_json.exists():
+            cms_names = {"blog-%s.html" % p["slug"] for p in
+                         json.loads(cms_json.read_text(encoding="utf-8")).get("posts", [])}
         for pat in ["デモ表示", "掲載見本", "準備中", "現在は業種・地域のみ",
                     "雛形", "法務確認のうえ"]:
             for f in html_files():
+                if f.name in cms_names:
+                    continue
                 if pat in f.read_text(encoding="utf-8"):
                     fail("placeholder",
                          "{0}: 本公開前に外すべき文言「{1}」が残っている".format(f.name, pat))
@@ -256,7 +265,11 @@ def check_breadcrumb_sync():
         if not m:
             fail("breadcrumb", "{0}: 画面のパンくずが無い".format(f.name))
             continue
-        visible = re.sub(r"<[^>]+>", "", m.group(1)).replace("›", " ").split()
+        # 区切りは「›」だけ。空白で割ると「A&B 更新のポイント」のように空白を含む題名が
+        # 2要素に割れて誤検知する（CMS記事の題名で実際に起きた）。実体参照も文字に戻して比べる。
+        import html as html_mod
+        visible = [html_mod.unescape(t).strip()
+                   for t in re.sub(r"<[^>]+>", "", m.group(1)).split("›") if t.strip()]
         jl = None
         for block in re.findall(
                 r'<script type="application/ld\+json">(.*?)</script>', txt, re.S):
