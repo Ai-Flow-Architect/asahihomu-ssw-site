@@ -141,10 +141,19 @@ def check_placeholders():
         if cms_json.exists():
             cms_names = {"blog-%s.html" % p["slug"] for p in
                          json.loads(cms_json.read_text(encoding="utf-8")).get("posts", [])}
+        # ✅ 例外（取締役確定 2026-09-08）＝voice.html の「掲載見本」だけは残したまま本公開する。
+        # voice の2〜4件目は当方が書いた文例で、実在のお客様の声ではない（1件目だけが実績＝
+        # ご許諾を得て企業名を掲載）。2026-08-04 の5AI事実検証で「実企業名のない声」を本物に
+        # 見せないよう、このタグと冒頭の注記文を付けた＝タグが残ること自体が誤認防止の実装で、
+        # 制作途中の置き忘れではない。実在企業の声はご許諾が取れ次第 1件ずつ差し替える運用。
+        # 🔴 例外はこの 1ページ × 1語 だけ＝voice.html も他の5語では止まり続ける。
+        ALLOW_PLACEHOLDER = {("voice.html", "掲載見本")}
         for pat in ["デモ表示", "掲載見本", "準備中", "現在は業種・地域のみ",
                     "雛形", "法務確認のうえ"]:
             for f in html_files():
                 if f.name in cms_names:
+                    continue
+                if (f.name, pat) in ALLOW_PLACEHOLDER:
                     continue
                 if pat in f.read_text(encoding="utf-8"):
                     fail("placeholder",
