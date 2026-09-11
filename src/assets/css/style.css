@@ -102,7 +102,11 @@ p { margin: 0 0 1em; }
 .nav__list a { display: inline-block; padding: 8px 9px; color: var(--ink); font-weight: 600; font-size: .9rem; border-radius: 8px; white-space: nowrap; }
 .nav__list a:hover, .nav__list a[aria-current="page"] { background: var(--sky); color: var(--navy); }
 
-.header-cta { display: none; }
+/* 2026-09-11: 後ろの .btn { display:inline-flex } に上書きされ、狭い画面でも表示されて2行に折れていた。
+   詳細度を上げて「1180px 未満はメニュー内のボタンだけ」という元の設計に戻す */
+.site-header .header-cta { display: none; }
+/* 語の途中で改行させない（見出しの「特定技能サ／ポート」のような割れを防ぐ） */
+.nowrap { white-space: nowrap; }
 
 .nav-toggle {
   display: inline-flex; flex-direction: column; gap: 5px; justify-content: center;
@@ -152,7 +156,8 @@ p { margin: 0 0 1em; }
   content: ""; position: absolute; right: -120px; top: -120px; width: 420px; height: 420px;
   border-radius: 50%; background: radial-gradient(circle, rgba(245,166,35,.28), transparent 70%);
 }
-.hero__inner { position: relative; padding: 72px 0 76px; max-width: 760px; }
+/* 左右は .container の 20px を活かす（2026-09-11: padding の一括指定で左右が 0 に上書きされ、スマホで文字が画面端に接していた） */
+.hero__inner { position: relative; padding-top: 72px; padding-bottom: 76px; max-width: 760px; }
 .hero__eyebrow { display: inline-block; background: rgba(245,166,35,.18); color: #ffd98a; font-weight: 700; font-size: .85rem; padding: 6px 14px; border-radius: 999px; margin-bottom: 18px; }
 .hero h1 { color: #fff; font-size: clamp(1.7rem, 5.4vw, 2.7rem); margin: 0 0 18px; letter-spacing: .01em; }
 .hero h1 .accent { color: var(--amber); }
@@ -342,7 +347,7 @@ table.tbl .hl { color: var(--amber-dark); font-weight: 800; }
 
 @media (min-width: 1180px) {
   .nav { display: block; }
-  .header-cta { display: inline-flex; }
+  .site-header .header-cta { display: inline-flex; }
   .nav-toggle { display: none; }
   .mobile-menu { display: none !important; }
 }
