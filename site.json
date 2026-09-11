@@ -112,6 +112,7 @@
         "lead": "今回は『特定技能とはどんな制度なのか』を、社会保険労務士の安田さんに、はじめての方にも分かるように伺います。受け入れまでに会社が何をするのか、この回でひと通りつかめる内容です。",
         "duration": "17:19",
         "youtube_id": "ZsvmPv03Ou8",
+        "related_posts": ["blog-difference", "blog-preparation", "blog-cost"],
         "chapters": [
           {
             "t": "00:00",
@@ -149,6 +150,7 @@
         "lead": "今回は『支援機関の選び方』です。何を見て選べばよいのか、そして あさひほうむが日々どんな支援をしているのかを伺います。",
         "duration": "20:27",
         "youtube_id": "QZL64WGPsXI",
+        "related_posts": ["blog-care-attention", "blog-illegal-work"],
         "chapters": [
           {
             "t": "00:00",
@@ -186,6 +188,7 @@
         "lead": "今回は『特定技能あるある』です。受け入れの現場で本当に起きること、つまずきやすいところを、包み隠さず伺います。",
         "duration": "29:32",
         "youtube_id": "tPguqpNsHyA",
+        "related_posts": ["blog-retention", "blog-signs", "blog-safety"],
         "chapters": [
           {
             "t": "00:00",

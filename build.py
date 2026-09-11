@@ -434,7 +434,8 @@ def video_blocks():
         lead = _html.escape(v["lead"])
         dur = _html.escape(v["duration"])
         yid = (v.get("youtube_id") or "").strip()
-        parts = ['<article class="card" style="margin-bottom:32px;">']
+        # id＝お役立ち記事から videos.html#<slug> で直接この動画へ飛べるようにする（8/7 のお約束）
+        parts = ['<article class="card" id="%s" style="margin-bottom:32px;">' % _html.escape(v["slug"])]
         parts.append('<h2 style="margin-top:0;">%d. %s</h2>' % (i, t))
         parts.append('<p class="muted">%s（%s）</p>' % (lead, dur))
         if yid:
@@ -452,9 +453,42 @@ def video_blocks():
         else:
             parts.append('<p class="placeholder-note">※ この動画は現在準備中です。'
                          '公開でき次第、このページでご覧いただけます。</p>')
+        rel = related_posts(v)
+        if rel:
+            parts.append('<h3>あわせて読みたい お役立ち情報</h3><ul class="related-posts">')
+            for p in rel:
+                parts.append('<li><a href="%s.html">%s</a></li>' % (p["slug"], _html.escape(p["name"])))
+            parts.append("</ul>")
         parts.append("</article>")
         out.append("\n".join(parts))
     return "\n".join(out)
+
+
+def related_posts(video):
+    """site.json の videos.items[].related_posts（記事 slug）をページ定義へ解決する。
+    無い slug はビルドを止める＝リンク切れを公開しない（2026-09-11 動画⇔記事の相互リンク）。"""
+    by_slug = {p["slug"]: p for p in PAGES}
+    out = []
+    for s in video.get("related_posts", []):
+        if s not in by_slug or (by_slug[s].get("parent") or {}).get("slug") != "blog":
+            sys.exit("中止: 動画 %r の related_posts に存在しない記事 slug: %r" % (video.get("slug"), s))
+        out.append(by_slug[s])
+    return out
+
+
+def video_links(page):
+    """記事ページの「関連情報」先頭に置く動画へのリンク。related_posts の逆引き。
+    どの動画にも紐づかない記事（CMS の新規記事など）には動画ページ全体へのリンクを出す。"""
+    import html as _html
+
+    if (page.get("parent") or {}).get("slug") != "blog":
+        return ""
+    vids = CFG.get("videos", {}).get("items", [])
+    hits = [v for v in vids if page["slug"] in v.get("related_posts", [])]
+    if not hits:
+        return '<a href="videos.html">→ 動画で知る特定技能（インタビュー動画）</a><br>'
+    return "\n      ".join('<a href="videos.html#%s">→ 動画で見る：%s</a><br>'
+                           % (_html.escape(v["slug"]), _html.escape(v["title"])) for v in hits)
 
 
 def site_verification_meta(site):
@@ -507,6 +541,8 @@ def token_map(page):
         "{{GUIDEBOOK_URL}}": CFG.get("download", {}).get("guidebook_url", ""),
         # 動画一覧。YouTube ID が空の本は埋め込まず「準備中」を出す（誤ったURLを載せないため）
         "{{VIDEO_BLOCKS}}": video_blocks(),
+        # お役立ち記事 → 動画（記事ページの「関連情報」先頭）。記事以外のページでは空
+        "{{VIDEO_LINKS}}": video_links(page),
         # お役立ち情報 一覧の先頭に CMS 記事のカード（0件なら空）
         "{{CMS_POST_CARDS}}": cms_post_cards(),
         # 資料DLページの文言。PDF現物と送信先の2つから機械で決める（手打ちの stale を作らない）
