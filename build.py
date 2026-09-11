@@ -457,6 +457,16 @@ def video_blocks():
     return "\n".join(out)
 
 
+def site_verification_meta(site):
+    """Google Search Console 所有権確認の meta（URLプレフィックス＋HTMLタグ方式）。
+    site.json の google_site_verification が空なら出さない。英数字・-・_ 以外を含む値や
+    長さが不自然な値も出さない（貼り間違いで壊れた <head> を公開しないため）。"""
+    v = (site.get("google_site_verification") or "").strip()
+    if not (20 <= len(v) <= 80 and all(c.isalnum() or c in "-_" for c in v)):
+        return ""
+    return f'<meta name="google-site-verification" content="{v}">'
+
+
 def token_map(page):
     site = CFG["site"]
     org = CFG["org"]
@@ -468,6 +478,7 @@ def token_map(page):
         "{{TITLE}}": page["title"],
         "{{DESCRIPTION}}": page["desc"],
         "{{ROBOTS}}": robots,
+        "{{SITE_VERIFICATION}}": site_verification_meta(site),
         "{{CANONICAL}}": canonical,
         "{{OG_TYPE}}": "website" if page["slug"] == "index" else "article",
         "{{SITE_NAME}}": site["name"],
