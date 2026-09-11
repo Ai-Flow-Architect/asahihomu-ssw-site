@@ -4,17 +4,17 @@
     "short_name": "あさひほうむ 特定技能",
     "tagline": "きづきを、きずなに。",
     "description": "茨城・千葉の登録支援機関。社労士×行政書士×キャリアコンサルタントのワンストップで、特定技能外国人材の受け入れを「安く・手厚く」サポートします。",
-    "base_url": "https://ai-flow-architect.github.io/asahihomu-ssw-site",
+    "base_url": "https://asahihoumu.jp",
     "lang": "ja",
     "locale": "ja_JP",
     "theme_color": "#1b3a5b",
     "_note_theme_color": "客様ご希望「落ち着いた紺色」＝現行値で合致（2026-07-21 ヒアリング回答3）。",
     "copyright_holder": "株式会社あさひほうむ",
-    "policy_date": "",
-    "_note_policy_date": "プライバシーポリシーの制定日。🔴 ここに入れてよいのは『客様が本ポリシーの内容をご確認・ご承認された日』だけ＝当方の都合で本公開日を先に埋めない。2026-09-02 に privacy.html から社内向け注記（『本ポリシーは雛形です…法務確認のうえ最終化してください』）を外したため、承認が済んでいないことを機械で示すのはこの空欄1つになった（空のままだと本番モードのビルド検査が落ちる＝未承認では公開できない）。内容は事業者名・連絡先・お問い合わせ窓口を site.json から差し込む形で実データ化済み。",
-    "preview": true,
-    "_note_preview": "true=仮プレビュー公開。全ページ noindex,nofollow ＋ robots.txt 全Disallow（検索結果に出さない）。本番公開時に false へ。",
-    "_note_base_url": "本番ドメイン未確定（新規取得を当方手配・費用は御社ご負担）。取得後に確定URLへ差し替え。"
+    "policy_date": "2026年9月10日",
+    "_note_policy_date": "プライバシーポリシーの制定日。🔴 ここに入れてよいのは『客様が本ポリシーの内容をご確認・ご承認された日』だけ＝当方の都合で本公開日を先に埋めない。2026-09-02 に privacy.html から社内向け注記（『本ポリシーは雛形です…法務確認のうえ最終化してください』）を外したため、承認が済んでいないことを機械で示すのはこの空欄1つになった（空のままだと本番モードのビルド検査が落ちる＝未承認では公開できない）。内容は事業者名・連絡先・お問い合わせ窓口を site.json から差し込む形で実データ化済み。／✅ 2026-09-10 セットアップMTGで安田様が制定日を「9月10日」とご了承（口頭）。記載内容の最終確認は安田様が 9/11 に実施予定＝修正のご要望があれば随時改訂する。",
+    "preview": false,
+    "_note_preview": "true=仮プレビュー公開。全ページ noindex,nofollow ＋ robots.txt 全Disallow（検索結果に出さない）。本番公開時に false へ。／2026-09-11 本公開設定（false）へ。客様可視になるのは docs/ を push した時点。",
+    "_note_base_url": "✅ 2026-09-02 取得の asahihoumu.jp（御社名義・さくら）。2026-09-10 セットアップMTGでDNS設定済（A×4・AAAA×4・www CNAME）。2026-09-11 本公開設定へ切替。"
   },
   "org": {
     "legal_name": "株式会社あさひほうむ",
@@ -43,12 +43,12 @@
     ]
   },
   "contact": {
-    "form_endpoint": "",
-    "_note_form_endpoint": "🔴 通知先メールは代表アドレスのみで確定（2026-08-01 回答10）。外部フォームサービスの鍵（フォームID）が外部依存のため空＝空のままだと送信はモック動作。main.js は FormData POST ＋ Accept: application/json の作法で送る（Formspree 型のサービスをそのまま利用可）。差替え手順=①本番ドメイン確定後にフォームサービスで通知先を代表アドレスにしてフォーム作成 ②発行URLをここに設定 ③再ビルド ④実受信テスト（本番鍵が揃ってから必須）。"
+    "form_endpoint": "https://ssgform.com/s/G0QBZkAsekDK",
+    "_note_form_endpoint": "✅ 2026-09-10 セットアップMTGで SSGform（御社名義・フリープラン・月100送信）に「お問い合わせ」フォームを作成し設定。通知先=代表アドレス。値の正本は当方の認証情報ファイル。main.js は FormData POST ＋ Accept: application/json ＋ X-Requested-With（SSGform の Ajax 要件）で送る。"
   },
   "download": {
-    "form_endpoint": "",
-    "_note_form_endpoint": "🔴 資料ダウンロード登録（メール登録で即DL・承認制にしない=2026-07-21 回答d）の送信先。お問い合わせと同じフォームサービスに2本目のフォームを作って設定する。空のままだと登録はモック動作（デモ表示）。",
+    "form_endpoint": "https://ssgform.com/s/6Idm4Ob2UWsm",
+    "_note_form_endpoint": "✅ 2026-09-10 同 SSGform に「資料ダウンロード」フォームを作成し設定（お問い合わせとは別の2本目）。guidebook_url と揃ったので登録→即ダウンロードの本番動作になる。",
     "guidebook_url": "assets/docs/tokutei-ginou-guidebook.pdf",
     "_note_guidebook_url": "✅ 2026-08-31 客様よりPDF受領（LINE 20:19）。出入国在留管理庁「特定技能ガイドブック（事業者の方へ）」49ページ・7.9MB。公式配布物と md5 一致 ba6c3d775261（原本 https://www.moj.go.jp/isa/content/930006033.pdf ・2026-06-23 受領分とも同一）。配置先 src/assets/docs/tokutei-ginou-guidebook.pdf。🔴 残るは download.form_endpoint（フォームサービスの鍵）のみ＝両方が揃うと main.js が「登録→即ダウンロード」の本番動作へ切り替わる。本番化の際は members.html の「準備中」「デモ表示」の文言を本番モードの checks.py が機械的に検査する。🟠 出典表示の要否＝入管庁のコンテンツ利用ルールに従い、配布ページに出典と原本URLを明記する方針（実装済）。"
   },

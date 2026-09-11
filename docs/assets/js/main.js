@@ -128,7 +128,7 @@
 
       fetch(endpoint, {
         method: "POST",
-        headers: { "Accept": "application/json" },
+        headers: { "Accept": "application/json", "X-Requested-With": "XMLHttpRequest" },
         body: new FormData(form)
       }).then(function (res) {
         if (res.ok) {
@@ -201,7 +201,7 @@
       if (dlBtn) { dlBtn.disabled = true; dlBtn.textContent = "送信中…"; }
       fetch(dlEndpoint, {
         method: "POST",
-        headers: { "Accept": "application/json" },
+        headers: { "Accept": "application/json", "X-Requested-With": "XMLHttpRequest" },
         body: new FormData(login)
       }).then(function (res) {
         if (!res.ok) throw new Error("register failed");

@@ -5,16 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>特定技能 受け入れガイドブック（無料）｜あさひほうむ</title>
 <meta name="description" content="特定技能外国人の受け入れに役立つガイドブックを無料でご用意しています。メールアドレスのご登録だけで、審査なしでご覧いただけます。">
-<meta name="robots" content="noindex,nofollow">
-<link rel="canonical" href="https://ai-flow-architect.github.io/asahihomu-ssw-site/members.html">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://asahihoumu.jp/members.html">
 <!-- OGP -->
 <meta property="og:type" content="article">
 <meta property="og:title" content="特定技能 受け入れガイドブック（無料）｜あさひほうむ">
 <meta property="og:description" content="特定技能外国人の受け入れに役立つガイドブックを無料でご用意しています。メールアドレスのご登録だけで、審査なしでご覧いただけます。">
 <meta property="og:site_name" content="あさひほうむ 特定技能サポート">
 <meta property="og:locale" content="ja_JP">
-<meta property="og:url" content="https://ai-flow-architect.github.io/asahihomu-ssw-site/members.html">
-<meta property="og:image" content="https://ai-flow-architect.github.io/asahihomu-ssw-site/assets/img/ogp.jpg">
+<meta property="og:url" content="https://asahihoumu.jp/members.html">
+<meta property="og:image" content="https://asahihoumu.jp/assets/img/ogp.jpg">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#1b3a5b">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -30,8 +30,8 @@
   "name": "あさひほうむ 特定技能サポート",
   "legalName": "株式会社あさひほうむ",
   "description": "茨城・千葉の登録支援機関。社労士×行政書士×キャリアコンサルタントのワンストップで、特定技能外国人材の受け入れを「安く・手厚く」サポートします。",
-  "url": "https://ai-flow-architect.github.io/asahihomu-ssw-site",
-  "telephone": "090-2915-4773",
+  "url": "https://asahihoumu.jp",
+  "telephone": "050-3390-1811",
   "email": "asahihomehome@gmail.com",
   "areaServed": [
     "茨城県",
@@ -63,13 +63,13 @@
       "@type": "ListItem",
       "position": 1,
       "name": "ホーム",
-      "item": "https://ai-flow-architect.github.io/asahihomu-ssw-site/"
+      "item": "https://asahihoumu.jp/"
     },
     {
       "@type": "ListItem",
       "position": 2,
       "name": "資料ダウンロード",
-      "item": "https://ai-flow-architect.github.io/asahihomu-ssw-site/members.html"
+      "item": "https://asahihoumu.jp/members.html"
     }
   ]
 }
@@ -128,7 +128,7 @@
   <div class="container">
     <nav class="breadcrumb" aria-label="パンくず"><a href="index.html">ホーム</a><span>›</span>資料ダウンロード</nav>
     <h1>資料ダウンロード</h1>
-    <p>特定技能の受け入れに役立つ資料を、無料でご用意しています。<br>第1弾のガイドブックは現在準備中です。ご登録いただいた方から、公開時にご案内します。</p>
+    <p>特定技能の受け入れに役立つ資料を、無料でご用意しています。<br>メールアドレスのご登録だけで、その場でダウンロードいただけます。</p>
   </div>
 </section>
 
@@ -137,15 +137,15 @@
     <div class="grid grid--2" style="align-items:start;">
       <div>
         <h2 style="margin-top:0;">メールアドレスのご登録だけ。審査も承認もありません</h2>
-        <p class="muted">ガイドブックは現在準備中です。ご登録いただいた方には、公開でき次第いちばんにご案内します。公開後は、ご登録のその場でダウンロードいただけます。</p>
-        <p class="placeholder-note">※ 資料の配信は、本番ドメイン・サーバーの確定後に有効化します。現在はデモ表示です。</p>
+        <p class="muted">ご登録いただくと、その場でガイドブックをダウンロードいただけます。あわせて、今後の資料や制度改正のお知らせをメールでお届けします。</p>
 
         <div class="notice" id="member-note" style="display:none;margin:16px 0;"></div>
 
         <!-- data-endpoint / data-file は site.json の download 設定から差し込まれる。
              両方が設定されると main.js が「登録→即ダウンロード」の本番動作に切り替わる。
-             未設定（PDF現物・フォームサービスの鍵が未着）のうちはモック動作＝デモ表示。 -->
-        <form class="form" id="member-login" data-endpoint="" data-file="assets/docs/tokutei-ginou-guidebook.pdf" novalidate style="margin-top:16px;">
+             どちらかが未設定のうちは main.js がモック動作に落ち、上の文言も
+             build.py の download_texts() が受付前の表示に切り替える。 -->
+        <form class="form" id="member-login" data-endpoint="https://ssgform.com/s/6Idm4Ob2UWsm" data-file="assets/docs/tokutei-ginou-guidebook.pdf" novalidate style="margin-top:16px;">
           <div class="field">
             <label for="m-company">会社名・団体名</label>
             <input type="text" id="m-company" name="会社名" autocomplete="organization">
@@ -185,7 +185,7 @@
         <div class="card">
           <h3 style="margin-top:0;">ご用意している資料</h3>
           <ul class="dl-list" style="margin-top:14px;">
-            <li><span>📘 特定技能ガイドブック（事業者の方へ・全49ページ）</span><span class="tag">準備中</span></li>
+            <li><span>📘 特定技能ガイドブック（事業者の方へ・全49ページ）</span><span class="tag">ダウンロードできます</span></li>
           </ul>
           <p class="muted" style="font-size:.82rem;margin-top:12px;">制度のしくみ・雇用の流れ・必要書類の記載例・よくある質問まで、受け入れの全体像が1冊にまとまった資料です。</p>
           <p class="muted" style="font-size:.78rem;margin-top:8px;">出典：出入国在留管理庁「特定技能ガイドブック」（<a href="https://www.moj.go.jp/isa/applications/ssw/index.html" target="_blank" rel="noopener">出入国在留管理庁「特定技能制度」</a>）</p>

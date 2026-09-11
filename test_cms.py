@@ -25,6 +25,23 @@ PY = sys.executable
 fails = []
 
 
+def docs_snapshot():
+    """docs/ の全ファイルの中身ハッシュ。T9 は「テストの前後で docs/ が変わらない」ことを見る。
+
+    2026-09-11 旧 T9 は `git status docs` が空であること＝**現物の docs/ がコミット済みであること**に
+    依存しており、本公開準備で docs/CNAME を置いた時点で RED になった（テストの欠陥でなく状態依存）。
+    """
+    import hashlib
+    d = ROOT / "docs"
+    if not d.exists():
+        return {}
+    return {str(p.relative_to(d)): hashlib.md5(p.read_bytes()).hexdigest()
+            for p in sorted(d.rglob("*")) if p.is_file()}
+
+
+docs_before = docs_snapshot()
+
+
 def run(*args, env=None):
     return subprocess.run([PY, *args], cwd=ROOT, capture_output=True, text=True, env=env)
 
@@ -101,7 +118,12 @@ try:
     m = re.search(r'<meta name="description" content="([^"]*)"', older)
     check(m and "<" not in m.group(1), "T2: meta description にタグ混入")
     check("2026.09.10 更新" in older and "制度解説" in older, "T2: 日付/カテゴリ表示が無い")
-    check('name="robots" content="noindex,nofollow"' in older, "T2: preview 中なのに noindex でない")
+    # 2026-09-11 本公開設定へ倒した時に RED になった＝現物が preview=true である前提だった。
+    # 期待値を現物の site.json から決める（preview=true→noindex／false→index,follow）。
+    want_robots = ("noindex,nofollow" if json.loads(orig_site.decode("utf-8"))["site"].get("preview")
+                   else "index,follow")
+    check('name="robots" content="%s"' % want_robots in older,
+          "T2: robots が %s でない（preview=%s）" % (want_robots, want_robots.startswith("noindex")))
     r = run("checks.py")
     check(r.returncode == 0, "T2: checks.py が赤: " + r.stdout[-400:])
     print("T2 fixture2本: ページ+2・並び順OK・sitemap/JSON-LD OK・checks %s" % ("緑" if r.returncode == 0 else "赤"))
@@ -206,11 +228,11 @@ finally:
     SITE.write_bytes(orig_site)
     build()
 
-# ---- T9 docs/ 無変更（git 管理下のときだけ） ----
-if (ROOT / ".git").exists():
-    st = subprocess.run(["git", "status", "--porcelain", "docs"], cwd=ROOT, capture_output=True, text=True).stdout
-    check(st.strip() == "", "T9: docs/ に差分が出た:\n" + st)
-    print("T9 docs/: 差分なし")
+# ---- T9 docs/ 無変更（テスト前後の中身ハッシュを比較＝現物のコミット状態に依存しない） ----
+docs_after = docs_snapshot()
+changed = sorted(k for k in set(docs_before) | set(docs_after) if docs_before.get(k) != docs_after.get(k))
+check(not changed, "T9: テストの前後で docs/ が変わった: %s" % changed[:10])
+print("T9 docs/: テスト前後で変化なし（%d ファイル）" % len(docs_after))
 
 print("=" * 50)
 if fails:

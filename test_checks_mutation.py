@@ -6,13 +6,20 @@
 各ミュータントを dist/ に注入 → checks.py が exit 1 を返すことを確認 → 再ビルドで復元。
 
 使い方: python3 test_checks_mutation.py   （exit 0 = 全ミュータント撃墜）
+
+🔴 2026-09-11 本公開設定（preview=false）へ倒した時点で「noindex剥がし」が注入不能になり RED になった
+  ＝このテストは「現物の site.json が preview=true であること」に依存していた（test_videos 8/31 と同型）。
+  → 検査器の検出力を測る間だけ preview=true に倒し、終わったら site.json をバイト単位で復元する
+    （test_publish_gate と同じ作法）。本番モード専用の検査は test_publish_gate が担当する。
 """
+import json
 import subprocess
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 DIST = ROOT / "dist"
+CFG_PATH = ROOT / "site.json"
 PY = sys.executable
 
 
@@ -111,5 +118,18 @@ def main():
     return 0
 
 
+def main_preview_forced():
+    cfg_bak = CFG_PATH.read_bytes()
+    cfg = json.loads(cfg_bak.decode("utf-8"))
+    try:
+        if not cfg["site"].get("preview"):
+            cfg["site"]["preview"] = True
+            CFG_PATH.write_text(json.dumps(cfg, ensure_ascii=False, indent=2), encoding="utf-8")
+        return main()
+    finally:
+        CFG_PATH.write_bytes(cfg_bak)
+        rebuild()
+
+
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit(main_preview_forced())
